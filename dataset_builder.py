@@ -7,9 +7,6 @@ import json
 import unicodedata
 import wordfreq
 
-AUDIO_DIR = os.environ.get("TIRA_ELICITATION_WAVS")
-TIRA_ASR_CLIPS_DIR = os.environ.get("TIRA_ASR_CLIPS")
-TIRA_ASR_PYARROW_DIR = os.environ.get("TIRA_ASR_PYARROW")
 VERSION = "0.1.0"
 
 README_HEADER = string.Template(
