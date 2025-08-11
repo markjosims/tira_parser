@@ -161,7 +161,7 @@ def perform_textnorm(
     prev_len = len(df)
     df = df[has_tone_mask]
     toneless_row_num = prev_len-len(df)
-    toneless_str = f"- removed {toneless_row_num} rows with no tone marked, {len(df)} rows remaining, {get_df_duration(df)}"
+    toneless_str = f"- removed {toneless_row_num} rows with no tone marked, {len(df)} rows remaining"
     print(toneless_str)
     preproc_steps.append(toneless_str)
 
@@ -193,7 +193,7 @@ def perform_textnorm(
     prev_len = len(df)
     df = df[~has_en_mask]
     en_row_num = prev_len-len(df)
-    no_en_str = f"- removed {en_row_num} rows with English words, {len(df)} rows remaining, {get_df_duration(df)}"
+    no_en_str = f"- removed {en_row_num} rows with English words, {len(df)} rows remaining"
     unique_words_str = "- saved all detected English words to $TIRA_ASR_CLIPS/english_words "+\
         "and Tira words to $TIRA_ASR_CLIPS/tira_words.txt"
     print(no_en_str)
