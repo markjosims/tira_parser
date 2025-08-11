@@ -9,6 +9,10 @@ import unidecode
 import wordfreq
 
 VERSION = "0.1.0"
+DATA_DIR = os.environ.get(
+    'TIRA_MORPH_DATA_DIR',
+    os.path.join(os.getcwd(), 'data')
+)
 
 README_HEADER = string.Template(
 """
@@ -179,8 +183,8 @@ def perform_textnorm(
     has_en_mask = df[norm_col].apply(detect_en_words)
 
     # save detected words for manual verification
-    en_words_path = os.path.join(TIRA_ASR_CLIPS_DIR, "english_words.txt")
-    tira_words_path = os.path.join(TIRA_ASR_CLIPS_DIR, "tira_words.txt")
+    en_words_path = os.path.join(DATA_DIR, "english_words.txt")
+    tira_words_path = os.path.join(DATA_DIR, "tira_words.txt")
     with open(en_words_path, 'w', encoding='utf8') as f:
         f.writelines(['\n'.join(en_words)])
     with open(tira_words_path, 'w', encoding='utf8') as f:
@@ -210,7 +214,7 @@ def perform_textnorm(
 
     # normalize IPA charset
     print("Normalizing IPA character set...")
-    char_rep_json_path = os.path.join(TIRA_ASR_CLIPS_DIR, 'char_replacements.json')
+    char_rep_json_path = os.path.join(DATA_DIR, 'char_replacements.json')
     # # Uncomment to overwrite `char_rep_json`
     # unique_chars = set()
     # df[norm_col].apply(unique_chars.update)
@@ -279,12 +283,12 @@ def main() -> int:
     readme_header_str = README_HEADER.substitute(
         num_records=len(df),
     )
-    readme_out = os.path.join(TIRA_ASR_CLIPS_DIR, 'README.md')
+    readme_out = os.path.join(DATA_DIR, 'README.md')
     with open(readme_out, 'w', encoding='utf8') as f:
         f.write(readme_header_str+'\n')
         f.write('\n'.join(PREPROCESSING_STEPS))
 
-    transcriptions_path = os.path.join(TIRA_ASR_CLIPS_DIR, 'transcriptions.csv')
+    transcriptions_path = os.path.join(DATA_DIR, 'transcriptions.csv')
     df.to_csv(transcriptions_path, index_label='index')
 
 if __name__ == '__main__':
