@@ -2,3 +2,4 @@ pandas
 tqdm
 wordfreq
 pympi-ling
+unidecode
