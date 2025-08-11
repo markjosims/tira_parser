@@ -1,0 +1,524 @@
+{
+  "\u027a": {
+    "target": "\u027a",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER TURNED R WITH LONG LEG",
+    "unicode_point": "0x27a"
+  },
+  "\u0325": {
+    "target": "\u0325",
+    "comment": "",
+    "unicode_name": "COMBINING RING BELOW",
+    "unicode_point": "0x325"
+  },
+  "\u0251": {
+    "target": "\u0251",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER ALPHA",
+    "unicode_point": "0x251"
+  },
+  "\u030b": {
+    "target": "\u030b",
+    "comment": "",
+    "unicode_name": "COMBINING DOUBLE ACUTE ACCENT",
+    "unicode_point": "0x30b"
+  },
+  "z": {
+    "target": "z",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER Z",
+    "unicode_point": "0x7a"
+  },
+  "\u0258": {
+    "target": "\u0258",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER REVERSED E",
+    "unicode_point": "0x258"
+  },
+  "v": {
+    "target": "v",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER V",
+    "unicode_point": "0x76"
+  },
+  "\u0361": {
+    "target": "\u0361",
+    "comment": "",
+    "unicode_name": "COMBINING DOUBLE INVERTED BREVE",
+    "unicode_point": "0x361"
+  },
+  "r": {
+    "target": "r",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER R",
+    "unicode_point": "0x72"
+  },
+  "\u0261": {
+    "target": "\u0261",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER SCRIPT G",
+    "unicode_point": "0x261"
+  },
+  "n": {
+    "target": "n",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER N",
+    "unicode_point": "0x6e"
+  },
+  "j": {
+    "target": "j",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER J",
+    "unicode_point": "0x6a"
+  },
+  "\u0303": {
+    "target": "\u0303",
+    "comment": "",
+    "unicode_name": "COMBINING TILDE",
+    "unicode_point": "0x303"
+  },
+  "\u0272": {
+    "target": "\u0272",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER N WITH LEFT HOOK",
+    "unicode_point": "0x272"
+  },
+  "f": {
+    "target": "f",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER F",
+    "unicode_point": "0x66"
+  },
+  "b": {
+    "target": "b",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER B",
+    "unicode_point": "0x62"
+  },
+  "\u0279": {
+    "target": "\u0279",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER TURNED R",
+    "unicode_point": "0x279"
+  },
+  "\u0302": {
+    "target": "\u0302",
+    "comment": "",
+    "unicode_name": "COMBINING CIRCUMFLEX ACCENT",
+    "unicode_point": "0x302"
+  },
+  "\ua71c": {
+    "target": "\ua71c",
+    "comment": "",
+    "unicode_name": "MODIFIER LETTER RAISED DOWN ARROW",
+    "unicode_point": "0xa71c"
+  },
+  "\u030a": {
+    "target": "\u030a",
+    "comment": "",
+    "unicode_name": "COMBINING RING ABOVE",
+    "unicode_point": "0x30a"
+  },
+  "\u0291": {
+    "target": "\u0291",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER Z WITH CURL",
+    "unicode_point": "0x291"
+  },
+  "\u0250": {
+    "target": "\u0250",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER TURNED A",
+    "unicode_point": "0x250"
+  },
+  "\u2013": {
+    "target": "\u2013",
+    "comment": "",
+    "unicode_name": "EN DASH",
+    "unicode_point": "0x2013"
+  },
+  "\u0268": {
+    "target": "\u0268",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER I WITH STROKE",
+    "unicode_point": "0x268"
+  },
+  "\u0153": {
+    "target": "\u0153",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LIGATURE OE",
+    "unicode_point": "0x153"
+  },
+  "\ua71b": {
+    "target": "\ua71b",
+    "comment": "",
+    "unicode_name": "MODIFIER LETTER RAISED UP ARROW",
+    "unicode_point": "0xa71b"
+  },
+  "\u031e": {
+    "target": "\u031e",
+    "comment": "",
+    "unicode_name": "COMBINING DOWN TACK BELOW",
+    "unicode_point": "0x31e"
+  },
+  "\u0327": {
+    "target": "\u0327",
+    "comment": "",
+    "unicode_name": "COMBINING CEDILLA",
+    "unicode_point": "0x327"
+  },
+  "y": {
+    "target": "y",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER Y",
+    "unicode_point": "0x79"
+  },
+  "u": {
+    "target": "u",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER U",
+    "unicode_point": "0x75"
+  },
+  "m": {
+    "target": "m",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER M",
+    "unicode_point": "0x6d"
+  },
+  "i": {
+    "target": "i",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER I",
+    "unicode_point": "0x69"
+  },
+  "\u0283": {
+    "target": "\u0283",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER ESH",
+    "unicode_point": "0x283"
+  },
+  "e": {
+    "target": "e",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER E",
+    "unicode_point": "0x65"
+  },
+  "a": {
+    "target": "a",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER A",
+    "unicode_point": "0x61"
+  },
+  "\u03b8": {
+    "target": "\u03b8",
+    "comment": "",
+    "unicode_name": "GREEK SMALL LETTER THETA",
+    "unicode_point": "0x3b8"
+  },
+  "\u027b": {
+    "target": "\u027b",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER TURNED R WITH HOOK",
+    "unicode_point": "0x27b"
+  },
+  "\u0263": {
+    "target": "\u0263",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER GAMMA",
+    "unicode_point": "0x263"
+  },
+  "\u030c": {
+    "target": "\u030c",
+    "comment": "",
+    "unicode_name": "COMBINING CARON",
+    "unicode_point": "0x30c"
+  },
+  "\u0259": {
+    "target": "\u0259",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER SCHWA",
+    "unicode_point": "0x259"
+  },
+  "\u0273": {
+    "target": "\u0273",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER N WITH RETROFLEX HOOK",
+    "unicode_point": "0x273"
+  },
+  "\u026a": {
+    "target": "\u026a",
+    "comment": "",
+    "unicode_name": "LATIN LETTER SMALL CAPITAL I",
+    "unicode_point": "0x26a"
+  },
+  "\u0304": {
+    "target": "\u0304",
+    "comment": "",
+    "unicode_name": "COMBINING MACRON",
+    "unicode_point": "0x304"
+  },
+  "\u0255": {
+    "target": "\u0255",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER C WITH CURL",
+    "unicode_point": "0x255"
+  },
+  "\u030f": {
+    "target": "\u030f",
+    "comment": "",
+    "unicode_name": "COMBINING DOUBLE GRAVE ACCENT",
+    "unicode_point": "0x30f"
+  },
+  "\u0292": {
+    "target": "\u0292",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER EZH",
+    "unicode_point": "0x292"
+  },
+  "\u0266": {
+    "target": "\u0266",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER H WITH HOOK",
+    "unicode_point": "0x266"
+  },
+  "\u029d": {
+    "target": "\u029d",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER J WITH CROSSED-TAIL",
+    "unicode_point": "0x29d"
+  },
+  "\u025c": {
+    "target": "\u025c",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER REVERSED OPEN E",
+    "unicode_point": "0x25c"
+  },
+  "t": {
+    "target": "t",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER T",
+    "unicode_point": "0x74"
+  },
+  "p": {
+    "target": "p",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER P",
+    "unicode_point": "0x70"
+  },
+  "l": {
+    "target": "l",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER L",
+    "unicode_point": "0x6c"
+  },
+  "\u027e": {
+    "target": "\u027e",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER R WITH FISHHOOK",
+    "unicode_point": "0x27e"
+  },
+  "h": {
+    "target": "h",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER H",
+    "unicode_point": "0x68"
+  },
+  "\u026d": {
+    "target": "\u026d",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER L WITH RETROFLEX HOOK",
+    "unicode_point": "0x26d"
+  },
+  "d": {
+    "target": "d",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER D",
+    "unicode_point": "0x64"
+  },
+  "\u0254": {
+    "target": "\u0254",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER OPEN O",
+    "unicode_point": "0x254"
+  },
+  "\u027d": {
+    "target": "\u027d",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER R WITH TAIL",
+    "unicode_point": "0x27d"
+  },
+  "\u1dc9": {
+    "target": "\u1dc9",
+    "comment": "",
+    "unicode_name": "COMBINING ACUTE-GRAVE-ACUTE",
+    "unicode_point": "0x1dc9"
+  },
+  "\u0288": {
+    "target": "\u0288",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER T WITH RETROFLEX HOOK",
+    "unicode_point": "0x288"
+  },
+  "\u014b": {
+    "target": "\u014b",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER ENG",
+    "unicode_point": "0x14b"
+  },
+  "\u032f": {
+    "target": "\u032f",
+    "comment": "",
+    "unicode_name": "COMBINING INVERTED BREVE BELOW",
+    "unicode_point": "0x32f"
+  },
+  "\u025b": {
+    "target": "\u025b",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER OPEN E",
+    "unicode_point": "0x25b"
+  },
+  "\u03b2": {
+    "target": "\u03b2",
+    "comment": "",
+    "unicode_name": "GREEK SMALL LETTER BETA",
+    "unicode_point": "0x3b2"
+  },
+  "\u0330": {
+    "target": "\u0330",
+    "comment": "",
+    "unicode_name": "COMBINING TILDE BELOW",
+    "unicode_point": "0x330"
+  },
+  " ": {
+    "target": " ",
+    "comment": "",
+    "unicode_name": "SPACE",
+    "unicode_point": "0x20"
+  },
+  "\u0294": {
+    "target": "\u0294",
+    "comment": "",
+    "unicode_name": "LATIN LETTER GLOTTAL STOP",
+    "unicode_point": "0x294"
+  },
+  "\u0301": {
+    "target": "\u0301",
+    "comment": "",
+    "unicode_name": "COMBINING ACUTE ACCENT",
+    "unicode_point": "0x301"
+  },
+  "\u025f": {
+    "target": "\u025f",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER DOTLESS J WITH STROKE",
+    "unicode_point": "0x25f"
+  },
+  "\u026f": {
+    "target": "\u026f",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER TURNED M",
+    "unicode_point": "0x26f"
+  },
+  "w": {
+    "target": "w",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER W",
+    "unicode_point": "0x77"
+  },
+  "s": {
+    "target": "s",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER S",
+    "unicode_point": "0x73"
+  },
+  "\u00f0": {
+    "target": "\u00f0",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER ETH",
+    "unicode_point": "0xf0"
+  },
+  "o": {
+    "target": "o",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER O",
+    "unicode_point": "0x6f"
+  },
+  "\u032a": {
+    "target": "\u032a",
+    "comment": "",
+    "unicode_name": "COMBINING BRIDGE BELOW",
+    "unicode_point": "0x32a"
+  },
+  "k": {
+    "target": "k",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER K",
+    "unicode_point": "0x6b"
+  },
+  "g": {
+    "target": "g",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER G",
+    "unicode_point": "0x67"
+  },
+  "c": {
+    "target": "c",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER C",
+    "unicode_point": "0x63"
+  },
+  "\u0270": {
+    "target": "\u0270",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER TURNED M WITH LONG LEG",
+    "unicode_point": "0x270"
+  },
+  "\u033a": {
+    "target": "\u033a",
+    "comment": "",
+    "unicode_name": "COMBINING INVERTED BRIDGE BELOW",
+    "unicode_point": "0x33a"
+  },
+  "\u0256": {
+    "target": "\u0256",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER D WITH TAIL",
+    "unicode_point": "0x256"
+  },
+  "\u0300": {
+    "target": "\u0300",
+    "comment": "",
+    "unicode_name": "COMBINING GRAVE ACCENT",
+    "unicode_point": "0x300"
+  },
+  "\u028a": {
+    "target": "\u028a",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER UPSILON",
+    "unicode_point": "0x28a"
+  },
+  "\u025e": {
+    "target": "\u025e",
+    "comment": "",
+    "unicode_name": "LATIN SMALL LETTER CLOSED REVERSED OPEN E",
+    "unicode_point": "0x25e"
+  },
+  "\u02d0": {
+    "target": "\u02d0",
+    "comment": "",
+    "unicode_name": "MODIFIER LETTER TRIANGULAR COLON",
+    "unicode_point": "0x2d0"
+  },
+  "\u0318": {
+    "target": "\u0318",
+    "comment": "",
+    "unicode_name": "COMBINING LEFT TACK BELOW",
+    "unicode_point": "0x318"
+  },
+  "\u0329": {
+    "target": "\u0329",
+    "comment": "",
+    "unicode_name": "COMBINING VERTICAL LINE BELOW",
+    "unicode_point": "0x329"
+  }
+}
