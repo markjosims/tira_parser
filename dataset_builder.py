@@ -5,7 +5,7 @@ import pandas as pd
 import string
 import json
 import unicodedata
-import unidecode
+from unidecode import unidecode
 import wordfreq
 
 VERSION = "0.1.0"
