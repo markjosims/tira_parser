@@ -280,8 +280,22 @@ def main() -> int:
     
     df, _ = perform_textnorm(df, PREPROCESSING_STEPS)
 
+    words_per_row = df['text'].str.split()
+    num_words_per_row = words_per_row.apply(len)
+    num_words = num_words_per_row.sum()
+    mean_sentence_len = num_words/len(df)
+    all_words = set()
+    words_per_row.apply(all_words.update)
+    
+
     readme_header_str = README_HEADER.substitute(
-        num_records=len(df),
+        num_sentences=len(df),
+        num_words=num_words,
+        num_word_unique=len(all_words),
+        mean_sentence_len=mean_sentence_len,
+        num_analyses=None,
+        num_word_analyzed=None,
+        num_morphs=None,
     )
     readme_out = os.path.join(DATA_DIR, 'README.md')
     with open(readme_out, 'w', encoding='utf8') as f:
