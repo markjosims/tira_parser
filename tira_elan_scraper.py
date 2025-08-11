@@ -10,7 +10,14 @@ with file basenames, timestamps, Elan tier names and values.
 """
 
 TIRA_RECORDINGS_GDRIVE = os.environ.get("TIRA_RECORDINGS_GDRIVE")
-LIST_PATH = 'meta/tira_elan_raw.csv'
+DATA_DIR = os.environ.get(
+    'TIRA_MORPH_DATA_DIR',
+    os.path.join(os.getcwd(), 'data')
+)
+LIST_PATH = os.path.join(
+    DATA_DIR,
+    'tira_elan_raw.csv'
+)
 
 
 def main() -> int:

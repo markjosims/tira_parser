@@ -237,7 +237,7 @@ def perform_textnorm(
 
     print("Checking only expected chars are found in dataset...")
     expected_chars_basename = 'tira_asr_unique_chars.json'
-    expected_chars_path = os.path.join('meta', expected_chars_basename)
+    expected_chars_path = os.path.join(DATA_DIR, expected_chars_basename)
     with open(expected_chars_path, encoding='utf8') as f:
         expected_ipa_chars = json.load(f)
     if keep_punct:
