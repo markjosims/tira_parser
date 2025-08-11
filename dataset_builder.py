@@ -288,7 +288,7 @@ def main() -> int:
         f.write(readme_header_str+'\n')
         f.write('\n'.join(PREPROCESSING_STEPS))
 
-    transcriptions_path = os.path.join(DATA_DIR, 'transcriptions.csv')
+    transcriptions_path = os.path.join(DATA_DIR, 'analyses.csv')
     df.to_csv(transcriptions_path, index_label='index')
 
 if __name__ == '__main__':
