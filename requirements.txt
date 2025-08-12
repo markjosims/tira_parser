@@ -3,3 +3,4 @@ tqdm
 wordfreq
 pympi-ling
 unidecode
+openpyxl
