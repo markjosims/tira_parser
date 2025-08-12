@@ -14,6 +14,11 @@ DATA_DIR = os.environ.get(
     'TIRA_MORPH_DATA_DIR',
     os.path.join(os.getcwd(), 'data')
 )
+EXCEL_VERBS_PATH = os.environ.get(
+    'TIRA_VERBS_EXCEL',
+    os.path.join(DATA_DIR, 'verb_paradigms.xlsx')
+
+)
 
 README_HEADER = string.Template(
 """
@@ -27,6 +32,37 @@ $num_morphs unique morphemes.
 """
 )
 PREPROCESSING_STEPS = []
+
+verb_cols = [
+    "IMP.AND", 
+    "IMP.VEN", 
+    "PFV.VEN", 
+    "PFV.AND", 
+    "IPFV.AND", 
+    "IPFV.VEN", 
+    "PRS.PROG.AND",
+    "PRS.PROG.VEN", 
+    "Infinitive (NOM)",
+    "Infinitive (ACC)", 
+    "PROH.AND", 
+    "PROH.VEN",
+    "Dependent AND", 
+    "Dependent VEN",
+    "Hort.ITV",
+    "Hort.VEN",
+    "PST.PROG? 'were doing X, used to do X'",
+    "PST.PRF? AND",
+    "PST.PRF? VEN",
+    "FUT?",
+    "FUT.PROG?.AND 'will be doing X'",
+    "FUT.PROG?.VEN 'will be doing X'",
+    "FUT.PRF?.AND 'will have done X' (also: 'would have done' in a conditional or counterfactual)",
+    "FUT.PRF?.VEN  'will have done X' (also: 'would have done' in a conditional or counterfactual)",
+    "should, can X ",
+    "Let X do Y (dependent)",
+    "Passive",
+]
+source_cols = ["Source file"] + [f"Source file.{i}" for i in range(1, len(verb_cols))]
 
 # -------------- #
 # string helpers #
@@ -331,6 +367,30 @@ def get_transcription_mask(
         running_mask = running_mask | mask_for_interval
     return running_mask
 
+def ingress_excel_verbs() -> pd.DataFrame:
+    """
+    Load excel data on Tira verb paradigms and shape into dataframe with gloss column
+    populated by stem translation plus verb gloss as indicated by column label
+    in original excel spreadsheet.
+    """
+    excel_df = pd.read_excel(EXCEL_VERBS_PATH, keep_default_na=False, sheet_name='Verbs')
+    analyses = []
+    def add_verb_columns(row):
+        translation = row['Translation']
+        for verb_col, source_col in zip(verb_cols, source_cols):
+            if not row[verb_col]:
+                continue
+            gloss = translation + ' ' + verb_col
+            analyses.append({
+                "text": row[verb_col],
+                "eaf_basename": row.get(source_col, None),
+                "gloss": gloss,
+                "form": verb_col,
+            })
+    excel_df.apply(add_verb_columns, axis=1)
+    analyses_df = pd.DataFrame(data=analyses)
+    return analyses_df
+
 
 def main() -> int:
     df = pd.read_csv(LIST_PATH, keep_default_na=False)
@@ -367,6 +427,16 @@ def main() -> int:
 
     print("Merging annotations into dataframe...")
     df = pd.merge(df, annotation_df, how='left', on='text')
+
+    prev_len = len(df)
+    excel_df = ingress_excel_verbs()
+    df['source']='elan'
+    excel_df['source']='excel'
+    df = pd.concat([df, excel_df])
+    rows_added = len(df)-prev_len
+    excel_str = f"- added {rows_added} rows from excel data"
+    PREPROCESSING_STEPS.append(excel_str)
+    print(excel_str)
 
     df, _ = perform_textnorm(df, PREPROCESSING_STEPS)
 
