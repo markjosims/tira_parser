@@ -7,6 +7,7 @@ import json
 import unicodedata
 from unidecode import unidecode
 import wordfreq
+from tqdm import tqdm
 
 VERSION = "0.1.0"
 DATA_DIR = os.environ.get(
