@@ -261,9 +261,89 @@ def perform_textnorm(
 
     return df, preproc_steps
 
+def associate_tiers(
+        df: pd.DataFrame,
+        transription_tier: str = 'IPA Transcription',
+        annotation_tiers: List[str] = ['Gloss', 'Translation', 'Word']
+    ) -> pd.DataFrame:
+    """
+    For each unique transcription in `transcription_tier`, look for any
+    annotations for each tier in `annotation_tiers`. Return a dataframe whose
+    columns correspond to `transcription_tier` and the various `annotation_tiers`
+    with one row for each unique transcription on `transcription_tier`.
+    """
+    transcription_tier_mask = df['tier']==transription_tier
+    unique_transcriptions = df.loc[transcription_tier_mask, 'text'].unique().tolist()
+    annotation_dict = {transription_tier: unique_transcriptions}
+    tier_masks = {}
+    for tier in annotation_tiers:
+        tier_mask = df['tier']==tier
+        tier_masks[tier]=tier_mask
+        annotation_dict[tier]=list()
+    for transcription in tqdm(unique_transcriptions):
+        transcription_mask = get_transcription_mask(df, transcription, transcription_tier_mask)
+        for tier in annotation_tiers:
+            annotation_mask = tier_masks[tier]
+            annotation = get_annotation_for_transcription(df, transcription_mask, annotation_mask)
+            annotation_dict[tier].append(annotation)
+    
+    annotation_df = pd.DataFrame(data=annotation_dict)
+    return annotation_df
+
+def get_annotation_for_transcription(
+        df: pd.DataFrame,
+        transcription_mask: pd.Series,
+        annotation_mask: pd.Series,
+) -> str:
+    """
+    Given a mask corresponding to all rows coinciding with a given transcription
+    return the longest non-zero annotation, if any, on the respective annotation tier.
+    """
+    masked_df = df[transcription_mask&annotation_mask]
+    if len(masked_df)==0:
+        return ''
+    sorted_annotations = masked_df['text'].sort_values(ascending=False)
+    longest_annotation = sorted_annotations.iloc[0]
+    return longest_annotation
+
+def get_transcription_mask(
+        df: pd.DataFrame,
+        transcription: str,
+        transcription_tier_mask: pd.Series,
+) -> pd.Series:
+    """
+    Given a string indicating a particular transcription value,
+    return a mask over all rows in the dataset that coincide with the
+    timestamp and source file of one of the instances of that transcription value.
+    """
+    running_mask = pd.Series([False]*len(df))
+    transcription_text_mask = (df['text']==transcription)&transcription_tier_mask
+    for _, row in df[transcription_text_mask].iterrows():
+        start, end = row['start'], row['end']
+        eaf_basename = row['eaf_basename']
+        
+        start_mask = df['start']==start
+        end_mask = df['end']==end
+        basename_mask = df['eaf_basename']==eaf_basename
+
+        mask_for_interval = start_mask&end_mask&basename_mask&~transcription_tier_mask
+        running_mask = running_mask | mask_for_interval
+    return running_mask
+
+
 def main() -> int:
     df = pd.read_csv(LIST_PATH)
     print(len(df))
+
+    annotations_path = os.path.join(DATA_DIR, 'annotations.csv')
+    if not os.path.exists(annotations_path):
+        print("Associating annotations to transcriptions...")
+        annotation_df = associate_tiers(df)
+        annotation_df.to_csv(annotations_path, index_label='index')
+    else:
+        print("Loading annotations...")
+        annotation_df = pd.read_csv(annotations_path, index_col='index')
+    annotation_df = annotation_df.rename(columns={'IPA Transcription': 'text'})
 
     # only interested in 'IPA Transcription', no other tiers
     print("Dropping non-transcription annotations...")
