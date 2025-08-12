@@ -357,7 +357,16 @@ def main() -> int:
     nan_str = f"- {len(df)} non-NaN transcriptions in dataset"
     print(nan_str)
     PREPROCESSING_STEPS.append(nan_str)
-    
+
+    # drop duplicates
+    df = df.drop_duplicates(subset='text')
+    dedup_str = f"- {len(df)} non-duplicate transcriptions in dataset"
+    print(dedup_str)
+    PREPROCESSING_STEPS.append(dedup_str)
+
+    print("Merging annotations into dataframe...")
+    df = pd.merge(df, annotation_df, how='left', on='text')
+
     df, _ = perform_textnorm(df, PREPROCESSING_STEPS)
 
     words_per_row = df['text'].str.split()
