@@ -332,7 +332,7 @@ def get_transcription_mask(
 
 
 def main() -> int:
-    df = pd.read_csv(LIST_PATH)
+    df = pd.read_csv(LIST_PATH, keep_default_na=False)
     print(len(df))
 
     annotations_path = os.path.join(DATA_DIR, 'annotations.csv')
