@@ -4,3 +4,4 @@ wordfreq
 pympi-ling
 unidecode
 openpyxl
+pynini
