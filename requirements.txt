@@ -5,3 +5,4 @@ pympi-ling
 unidecode
 openpyxl
 pynini
+ipykernel
