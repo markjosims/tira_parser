@@ -17,8 +17,8 @@ DATA_DIR = os.environ.get(
 EXCEL_VERBS_PATH = os.environ.get(
     'TIRA_VERBS_EXCEL',
     os.path.join(DATA_DIR, 'verb_paradigms.xlsx')
-
 )
+EXCEL_SHEET_NAME = 'Verbs'
 
 README_HEADER = string.Template(
 """
@@ -373,7 +373,7 @@ def ingress_excel_verbs() -> pd.DataFrame:
     populated by stem translation plus verb gloss as indicated by column label
     in original excel spreadsheet.
     """
-    excel_df = pd.read_excel(EXCEL_VERBS_PATH, keep_default_na=False, sheet_name='Verbs')
+    excel_df = pd.read_excel(EXCEL_VERBS_PATH, keep_default_na=False, sheet_name=EXCEL_SHEET_NAME)
     analyses = []
     def add_verb_columns(row):
         translation = row['Translation']
