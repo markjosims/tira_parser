@@ -7,7 +7,8 @@ import pandas as pd
 import os
 from dataset_builder import DATA_DIR, EXCEL_VERBS_PATH, EXCEL_SHEET_NAME
 
-OUTPATH = os.path.join(DATA_DIR, "verb_roots.csv")
+ROOTS_OUTPATH = os.path.join(DATA_DIR, "verb_roots.csv")
+ROOTS_INPATH = os.path.join(DATA_DIR, "verb_roots_new.csv")
 
 def get_roots_from_excel() -> int:
     df = pd.read_excel(EXCEL_VERBS_PATH, sheet_name=EXCEL_SHEET_NAME)
@@ -15,7 +16,7 @@ def get_roots_from_excel() -> int:
     df['sense']=df.apply(get_translation_and_class, axis=1)
     group_by_root = df.groupby(by='Root')
     root2unique_senses = group_by_root['sense'].apply(set).apply("; ".join)
-    root2unique_senses.to_csv(OUTPATH, index_label='root')
+    root2unique_senses.to_csv(ROOTS_OUTPATH, index_label='root')
 
     return 0
 
