@@ -9,6 +9,7 @@ from dataset_builder import DATA_DIR, EXCEL_VERBS_PATH, EXCEL_SHEET_NAME
 
 ROOTS_OUTPATH = os.path.join(DATA_DIR, "verb_roots.csv")
 ROOTS_INPATH = os.path.join(DATA_DIR, "verb_roots_new.csv")
+ROOTS_FINAL_OUTPATH = os.path.join(DATA_DIR, "verb_roots_final.csv")
 
 OLD_ROOT_COL = 'Root'
 OLD_SENSE_COL = 'Translation'
@@ -53,17 +54,28 @@ def apply_roots_to_excel() -> int:
         axis=1,
     )
     root2sense = {}
+    root2fv = {}
     roots_df[~rows_to_merge].apply(
         lambda row: root2sense.update({row['root']: row['new_sense']}),
+        axis=1,
+    )
+    roots_df[~rows_to_merge].apply(
+        lambda row: root2fv.update({row['root']: row['inflection_class']}),
         axis=1,
     )
     
     print("Merging roots in Excel data...")
     excel_df[ROOT_COL]=excel_df[OLD_ROOT_COL].map(root2merge)
-    print("Adding senses to Excel data...")
+    print("Adding senses and FV labels to Excel data...")
     excel_df[SENSE_COL]=excel_df[ROOT_COL].map(root2sense)
+    excel_df[FV_COL]=excel_df[ROOT_COL].map(root2sense)
 
-    excel_df.to_excel(EXCEL_VERBS_PATH, sheet_name=EXCEL_SHEET_NAME)
+    excel_df.to_excel(EXCEL_VERBS_PATH, sheet_name=EXCEL_SHEET_NAME, index=False)
+
+    roots_final_df = excel_df[[ROOT_COL, SENSE_COL, FV_COL]]
+    roots_final_df = roots_final_df.drop_duplicates().dropna()
+    roots_final_df.to_csv(ROOTS_FINAL_OUTPATH, index=False)
+
 
     return 0
 
