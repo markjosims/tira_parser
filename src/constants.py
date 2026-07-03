@@ -12,10 +12,13 @@ SCHEMA_DIR = os.path.join(PROJECT_ROOT, 'schemas')
 
 
 def get_yaml_dir():
-    # for now just greedily reload dotenv to check for changes
-    # TODO: make this less hacky
-    load_dotenv(os.path.join(PROJECT_ROOT, "parC.env"), override=True)
+    load_dotenv(os.path.join(PROJECT_ROOT, "parC.env"))
     return os.environ.get("YAML_DIR") or os.path.join(PROJECT_ROOT, "yaml", "spanish-example")
+
+
+def set_yaml_dir(path: str):
+    # TODO: add UI for changing YAML_DIR
+    os.environ["YAML_DIR"] = path
 
 # pynini constants
 

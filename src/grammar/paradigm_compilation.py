@@ -223,19 +223,19 @@ def _get_or_build(
     paradigm_name: str, graph_type: str, force_rebuild: bool = False
 ) -> pynini.Fst:
     graph_index = _FST_KINDS.index(graph_type)
-    if force_rebuild or not _paradigm_cache_valid(paradigm_name):
-        if not force_rebuild and _paradigm_cache_valid(paradigm_name):
-            loaded = _load_paradigm(paradigm_name)
-            if loaded is not None:
-                return loaded[graph_index]
-        inflect = build_inflect_graph(paradigm_name)
-        parse = build_parse_graph(inflect)
-        search_lexicon, search_left_factor = build_search_lexicon_and_leftfactor(
-            inflect
-        )
-        _save_paradigm(
-            paradigm_name, inflect, parse, search_lexicon, search_left_factor
-        )
+    if not force_rebuild and _paradigm_cache_valid(paradigm_name):
+        loaded = _load_paradigm(paradigm_name)
+        if loaded is not None:
+            return loaded[graph_index]
+
+    inflect = build_inflect_graph(paradigm_name)
+    parse = build_parse_graph(inflect)
+    search_lexicon, search_left_factor = build_search_lexicon_and_leftfactor(
+        inflect
+    )
+    _save_paradigm(
+        paradigm_name, inflect, parse, search_lexicon, search_left_factor
+    )
 
     graph_tuple = (inflect, parse, search_lexicon, search_left_factor)
     return graph_tuple[graph_index]

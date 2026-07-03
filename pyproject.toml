@@ -38,3 +38,7 @@ include = ["src*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.csv", "*.yaml", "*.yml", "*.json", "*.txt", "*.xlsx"]
+
+[pytest]
+env_override_existing_values = 1
+env_files = [".test.env"]

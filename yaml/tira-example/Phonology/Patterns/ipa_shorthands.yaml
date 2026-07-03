@@ -16,6 +16,18 @@ patterns:
   - name: Velar nasal
     pattern: ŋ
     ref: <Ng>
+  - name: High tone
+    ref: <H>
+    pattern: "\u0301"
+  - name: Low tone
+    ref: <L>
+    pattern: "\u0300"
+  - name: Rising tone
+    ref: <LH>
+    pattern: "\u030C"
+  - name: Falling tone
+    ref: <HL>
+    pattern: "\u0302"
 
 ## HELP FOR PATTERNS ##
 # List of pattern definitions.

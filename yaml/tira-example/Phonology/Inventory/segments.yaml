@@ -35,7 +35,7 @@ data:
             ref: <N>
             phones: [m, n, ɲ, ŋ]
           - name: liquids
-            ref: <L>
+            ref: <Liq>
             phones: [r, ɾ, ɽ, l]
           - name: glides
             ref: <Glide>
@@ -52,13 +52,13 @@ data:
       - name: low vowels
         ref: <Vlo>
         phones: [a]
-  - name: tone
-    ref: <T>
-    # \u0301: combining acute (high tone)
-    # \u0300: combining acute (high tone)
-    # \u0302: combining grave (falling tone)
-    # \u030C: combining caron (rising tone)
-    phones: ["\u0301", "\u0300", "\u0302", "\u030C"]
+      - name: tone
+        ref: <T>
+        # \u0301: combining acute (high tone)
+        # \u0300: combining acute (high tone)
+        # \u0302: combining grave (falling tone)
+        # \u030C: combining caron (rising tone)
+        phones: ["\u0301", "\u0300", "\u0302", "\u030C"]
 
 ## HELP FOR INVENTORY ##
 # The inventory is built as a nested tree

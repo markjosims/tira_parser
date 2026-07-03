@@ -21,15 +21,24 @@ def _is_valid(path: str, *source_dirs: str) -> bool:
     if not os.path.exists(path):
         return False
     mtime = os.path.getmtime(path)
-    return all(mtime >= os.path.getmtime(d) for d in source_dirs)
+    glob_list = []
+    for source_dir in source_dirs:
+        glob_list.extend(glob(os.path.join(source_dir, "*.yaml")))
+        glob_list.extend(glob(os.path.join(source_dir, "*.csv")))
+    return all(mtime >= os.path.getmtime(file) for file in glob_list)
 
 
 def is_syms_cache_valid(*source_dirs: str) -> bool:
-    return _is_valid(_SYMS_PATH, *source_dirs)
+    if _is_valid(_SYMS_PATH, *source_dirs):
+        return True
+    logger.info("Symbol table cache invalidated.")
+    return False
 
 
 def is_fst_cache_valid(kind: str, name: str, fst_kind: str, *source_dirs: str) -> bool:
-    return _is_valid(_fst_path(kind, name, fst_kind), *source_dirs)
+    if _is_valid(_fst_path(kind, name, fst_kind), *source_dirs):
+        return True
+    logger.info(f"Fst of kind {kind} {fst_kind} for {name} invalidated.")
 
 
 def save_symbol_table(syms: pynini.SymbolTable) -> None:

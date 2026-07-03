@@ -1,21 +1,21 @@
 kind: Rules
 rules:
-  - description:
-      "/e/ becomes [ie] and /o/ becomes [ue] in stressed syllables for certain
-      verbs
-
-      "
-    name: diphthongization
-    right_context: <C>*#
-    string_map:
-      - - e
-        - ie
-      - - o
-        - ue
-  - description: "/e/ becomes [i] in stressed syllables
-
-      "
-    input_pattern: e
-    name: stressed_e_to_i
-    output_pattern: i
-    right_context: <C>*#
+- description: /e/ becomes [ie] and /o/ becomes [ue] in stressed syllables for certain
+    verbs
+  name: diphthongization
+  right_context: <CodaWF>
+  string_map:
+  - - e
+    - ie
+  - - o
+    - ue
+- description: /e/ becomes [i] in stressed syllables
+  input_pattern: e
+  name: stressed_e_to_i
+  output_pattern: i
+  right_context: <CodaWF>
+- description: '"zc" is written "c" before e, i'
+  input_pattern: <zc>
+  name: zc_c_alternation
+  output_pattern: c
+  right_context: e|i

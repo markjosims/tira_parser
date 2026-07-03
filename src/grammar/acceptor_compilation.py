@@ -321,6 +321,7 @@ def _tokenize_str(
             None,
         )
         if match is None:
+            breakpoint()
             raise ValueError(
                 f"Unrecognized token at position {i} in '{s}' "
                 f"(inferred type: '{token_type}')"

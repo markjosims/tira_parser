@@ -1,0 +1,69 @@
+data:
+- children:
+  - children:
+    - name: Voiced stops
+      phones:
+      - b
+      - d
+      - g
+      ref: <B>
+    - name: Voiceless stops
+      phones:
+      - p
+      - t
+      - c
+      - q
+      ref: <P>
+    name: Stops
+    ref: <Stp>
+  - name: Fricatives
+    phones:
+    - f
+    - v
+    - s
+    - z
+    - x
+    - h
+    - j
+    ref: <Frc>
+  - name: Sonorants
+    phones:
+    - r
+    - l
+    - y
+    - "u\u0308"
+    ref: <Son>
+  - name: Nasals
+    phones:
+    - m
+    - n
+    - "\xF1"
+    ref: <N>
+  name: Consonants
+  ref: <C>
+- children:
+  - name: High vowels
+    phones:
+    - i
+    - u
+    ref: <V_High>
+  - name: Mid vowels
+    phones:
+    - e
+    - o
+    ref: <V_Mid>
+  - name: Low vowels
+    phones:
+    - a
+    ref: <V_Low>
+  name: Vowels
+  ref: <V>
+- name: Stress marker
+  phones:
+  - "\u0301"
+  ref: <Stress>
+- name: Phonology tags
+  ref: <PhonologyTags>
+  tags:
+  - '[BlockVowelAlternation]'
+kind: Inventory
