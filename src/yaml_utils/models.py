@@ -1,5 +1,6 @@
 from typing import Any, Literal, NamedTuple
 
+
 class InventoryItemContents(NamedTuple):
     """
     Single inventory item contents (phones and tags)
@@ -72,13 +73,15 @@ class RuleSequence(NamedTuple):
 # A mapping of rule names to their corresponding rule objects.
 Rule = SimpleRule | StringMapRule | RuleSequence
 
-def resolve_rule(data: dict) -> Rule: 
+
+def resolve_rule(data: dict) -> Rule:
     for rule_class in (SimpleRule, StringMapRule, RuleSequence):
         try:
             return rule_class(**data)
         except:
             pass
     raise ValueError(f"Could not resolve rule with data {data}")
+
 
 class FeatureValue(NamedTuple):
     """
@@ -96,6 +99,7 @@ class Feature(NamedTuple):
 
     name: str
     values: tuple[str, ...]
+
 
 OperationTypeSingleString = Literal["prefix", "suffix", "suppletion", "rule"]
 OperationTypeStringTuple = Literal["replace"]
@@ -140,6 +144,7 @@ class PrincipalPartMarker(NamedTuple):
 
 Marker = SingleStringMarker | StringTupleMarker | UnorderedMarker | PrincipalPartMarker
 
+
 def resolve_marker(data: dict) -> Marker:
     for marker_class in (SingleStringMarker, StringTupleMarker, UnorderedMarker):
         try:
@@ -152,9 +157,19 @@ def resolve_marker(data: dict) -> Marker:
 class Token(NamedTuple):
     value: str
     kind: Literal[
-        "phone", "tag", "class_ref", "pattern_ref", "bow_eow", "edit_flag",
-        "special_ref", "unary_operator", "pipe_operator", "caret_operator",
-        "boundary", "left_delimiter", "right_delimiter",
+        "phone",
+        "tag",
+        "class_ref",
+        "pattern_ref",
+        "bow_eow",
+        "edit_flag",
+        "special_ref",
+        "unary_operator",
+        "pipe_operator",
+        "caret_operator",
+        "boundary",
+        "left_delimiter",
+        "right_delimiter",
     ]
 
     def __len__(self) -> int:

@@ -7,12 +7,12 @@ name = "parC"
 version = "0.1.0"
 description = "paradigm Compiler. Toolkit for morphological transduction based on paradigms"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.8, <3.11"
 dependencies = [
   "pandas",
   "tqdm",
   "openpyxl",
-  #  "pynini==2.1.6", # commenting out for now to prevent errors on Windows and Mac
+  "pynini==2.1.6",
   "graphviz",
   "pydot",
   "pyyaml",

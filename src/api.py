@@ -8,43 +8,44 @@ Provides following endpoints:
 """
 
 import os
+
 import pynini
+import uvicorn
 from fastapi import FastAPI, HTTPException
-from loguru import logger
 from fastapi.staticfiles import StaticFiles
+from loguru import logger
 from pydantic import BaseModel
 from pynini.lib import rewrite
-import uvicorn
 
+from src.constants import get_yaml_dir
 from src.grammar.acceptor_compilation import (
     fsa,
-    word_fsa,
     fsm_strings,
     get_symbol_table,
+    word_fsa,
 )
+from src.grammar.marker_resolution import get_free_features_for_paradigm
 from src.grammar.paradigm_compilation import (
+    get_roots_for_paradigm,
+    inflect,
     inflect_stages,
     parse,
-    inflect,
     search,
-    get_roots_for_paradigm,
 )
 from src.grammar.transducer_compilation import get_rule_fst
-from src.grammar.marker_resolution import get_free_features_for_paradigm
+from src.lexicon import (
+    get_features_for_root,
+    get_roots,
+)
 from src.yaml_utils.yaml_server import (
-    get_yaml_kind,
-    get_inventory_items,
     get_feature_map,
+    get_inflection_stages,
+    get_inventory_items,
     get_patterns,
     get_rules,
-    get_inflection_stages,
     get_yaml_data_safe,
+    get_yaml_kind,
 )
-from src.lexicon import (
-    get_roots,
-    get_features_for_root,
-)
-from src.constants import get_yaml_dir
 
 app = FastAPI()
 
@@ -363,3 +364,6 @@ def api_search(req: SearchRequest):
 
 
 app.mount("/", StaticFiles(directory="frontend", html=True), name="static")
+
+if __name__ == "__main__":
+    run_app()

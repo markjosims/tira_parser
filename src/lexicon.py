@@ -30,8 +30,7 @@ def init_lexicon(lexicon_basename: str, lexicon_path: str) -> None:
     )
     lexical_features = part_of_speech.get("lexical_features", [])
     principal_parts = part_of_speech.get("principal_parts", [])
-    df = pd.DataFrame(columns=["root", "gloss"] +
-                      lexical_features + principal_parts)
+    df = pd.DataFrame(columns=["root", "gloss"] + lexical_features + principal_parts)
     os.makedirs(os.path.dirname(lexicon_path), exist_ok=True)
     df.to_csv(lexicon_path, index=False)
 

@@ -92,14 +92,13 @@ def fix_refs_safe(schema: dict, SCHEMA_DIR: Path) -> dict:
 def get_referenced_content(ref_file_path: Path, object_path: str) -> tuple[dict, str]:
     # JSON path should be in the format "definitions/{OBJECT_NAME}"
     path_parts = object_path.strip("/").split("/")
-    assert (
-        len(path_parts) == 2 and path_parts[0] == "definitions"
-    ), "Only references to definitions are supported"
+    assert len(path_parts) == 2 and path_parts[0] == "definitions", (
+        "Only references to definitions are supported"
+    )
     definitions_key, object_name = path_parts
 
     if not ref_file_path.exists():
-        raise FileNotFoundError(
-            f"Referenced schema file not found: {ref_file_path}")
+        raise FileNotFoundError(f"Referenced schema file not found: {ref_file_path}")
 
     with open(ref_file_path, "r", encoding="utf-8") as f:
         ref_content = json.load(f)

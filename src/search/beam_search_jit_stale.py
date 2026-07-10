@@ -27,10 +27,9 @@ weights_index: int = 2
 labels_index: int = 3
 final_index: int = 4
 
+
 @nb.jit(nopython=True)
-def get_next_beams_jit(
-    beam: tuple, left: tuple, right: tuple
-) -> list[tuple]:
+def get_next_beams_jit(beam: tuple, left: tuple, right: tuple) -> list[tuple]:
     next_beams = []
 
     left_start_arc = left[offsets_index][beam[left_state_index]]
@@ -61,7 +60,10 @@ def get_next_beams_jit(
             left_weight = left[weights_index][left_start_arc + left_i]
             right_weight = right[weights_index][right_start_arc + right_i]
 
-            is_final = left[final_index][left_next_state] and right[final_index][right_next_state]
+            is_final = (
+                left[final_index][left_next_state]
+                and right[final_index][right_next_state]
+            )
 
             curr_beam = tuple(
                 left_next_state,
@@ -83,10 +85,9 @@ def get_next_beams_jit(
 
     return next_beams
 
+
 @nb.jit(nopython=True)
-def get_next_beams_fuzzy_jit(
-    beam: tuple, left: tuple, right: tuple
-) -> list[tuple]:
+def get_next_beams_fuzzy_jit(beam: tuple, left: tuple, right: tuple) -> list[tuple]:
     """
     Computes next beams allowing for inexact matches,
     weighted by Levenshtein edit distance
@@ -116,7 +117,10 @@ def get_next_beams_fuzzy_jit(
             hypothesis_weight = (
                 beam[weights_index] + edit_weight + left_weight + right_weight
             )
-            is_final = left[final_index][left_next_state] and right[final_index][right_next_state]
+            is_final = (
+                left[final_index][left_next_state]
+                and right[final_index][right_next_state]
+            )
 
             hypothesis = (
                 left_next_state,
@@ -134,7 +138,10 @@ def get_next_beams_fuzzy_jit(
         left_next_state = left[next_states_index][left_start_arc + left_i]
         left_weight = left[weights_index][left_start_arc + left_i]
 
-        is_final = left[final_index][left_next_state] and right[final_index][beam[right_state_index]]
+        is_final = (
+            left[final_index][left_next_state]
+            and right[final_index][beam[right_state_index]]
+        )
         hypothesis_weight = beam[weights_index] + delete_weight + left_weight
 
         hypothesis = (
@@ -153,7 +160,10 @@ def get_next_beams_fuzzy_jit(
         right_next_state = right[next_states_index][right_start_arc + right_i]
         right_weight = right[weights_index][right_start_arc + right_i]
 
-        is_final = left[final_index][beam[left_state_index]] and right[final_index][right_next_state]
+        is_final = (
+            left[final_index][beam[left_state_index]]
+            and right[final_index][right_next_state]
+        )
         hypothesis_weight = beam[weights_index] + delete_weight + right_weight
 
         hypothesis = (
@@ -166,6 +176,7 @@ def get_next_beams_fuzzy_jit(
         next_beams.append(hypothesis)
 
     return next_beams
+
 
 @nb.jit(nopython=True)
 def filter_repeat_beams_jit(beams: list[tuple]) -> list[tuple]:
@@ -191,6 +202,7 @@ def filter_repeat_beams_jit(beams: list[tuple]) -> list[tuple]:
 
     return list(label2beam.values())
 
+
 @nb.jit(nopython=True, debug=True)
 def intersect_beam_jit(
     left: tuple[np.ndarray],
@@ -207,13 +219,15 @@ def intersect_beam_jit(
 
     start_state_is_final = left[final_index][0] and right[final_index][0]
     # shadow `WfsaCsrBeam` using a vanilla tuple
-    initial_beam = tuple([
-        0,                      # initial left state
-        0,                      # initial right state
-        0.0,                    # initial path weight
-        tuple(),                # initial labels
-        start_state_is_final,   # whether initial state is also final
-    ])
+    initial_beam = tuple(
+        [
+            0,  # initial left state
+            0,  # initial right state
+            0.0,  # initial path weight
+            tuple(),  # initial labels
+            start_state_is_final,  # whether initial state is also final
+        ]
+    )
     beams: list[tuple] = [initial_beam]
     successful_beams: list[tuple] = []
 
@@ -227,7 +241,7 @@ def intersect_beam_jit(
             else:
                 beams_from_current = get_next_beams_jit(beam, left, right)
             beams_from_current.sort(key=lambda b: b[weights_index])
-            # avoid using 'list.extend' which uses a generator 
+            # avoid using 'list.extend' which uses a generator
             for b in beams_from_current:
                 next_beams.append(b)
 

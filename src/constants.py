@@ -2,23 +2,22 @@ import os
 from dotenv import load_dotenv
 
 # filepaths
-PROJECT_ROOT = os.path.dirname(
-    os.path.dirname(
-        __file__
-    )
-)
+PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
 
-SCHEMA_DIR = os.path.join(PROJECT_ROOT, 'schemas')
+SCHEMA_DIR = os.path.join(PROJECT_ROOT, "schemas")
 
 
 def get_yaml_dir():
     load_dotenv(os.path.join(PROJECT_ROOT, "parC.env"))
-    return os.environ.get("YAML_DIR") or os.path.join(PROJECT_ROOT, "yaml", "spanish-example")
+    return os.environ.get("YAML_DIR") or os.path.join(
+        PROJECT_ROOT, "yaml", "spanish-example"
+    )
 
 
 def set_yaml_dir(path: str):
     # TODO: add UI for changing YAML_DIR
     os.environ["YAML_DIR"] = path
+
 
 # pynini constants
 

@@ -46,8 +46,7 @@ class ReservedSymbolMixin:
     unary_operators = (star, plus, optional)
     pipe_operator = union  # (for now) pipe operator is only binary operator
     caret_operator = caret  # for negation in braced expressions
-    reserved_refs = (phone_ref, flag_ref, epsilon_ref,
-                     dot, sigma_ref, boundary_ref)
+    reserved_refs = (phone_ref, flag_ref, epsilon_ref, dot, sigma_ref, boundary_ref)
     bow_eow_tags = (bow, eow)
     edit_tags = (insert, substitute, delete)
     boundary_symbols = (affix_boundary, clitic_boundary, periphrasis_break)
