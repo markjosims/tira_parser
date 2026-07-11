@@ -25,7 +25,7 @@
       "items": {
         "type": "string"
       },
-      "description": "List of inflectional features this set expones."
+      "description": "List of features in the order they are nested in the markers object."
     },
     "global_stage": {
       "type": "string",
@@ -39,30 +39,28 @@
       "description": "A marker or list of markers applied to all forms in this paradigm."
     },
     "markers": {
-      "type": "array",
-      "description": "An array over feature vectors and their realizations.",
-      "items": {
-        "type": "object",
-        "required": [
-          "features",
-          "realization"
-        ],
-        "properties": {
-          "features": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "The feature value vector specified for this marker group."
-          },
-          "realization": {
-            "type": "array",
-            "items": {
-              "$ref": "./FeatureMarkers.json#/definitions/marker"
-            }
+      "$ref": "#/definitions/nested_markers"
+    }
+  },
+  "definitions": {
+    "nested_markers": {
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "$ref": "./FeatureMarkers.json#/definitions/marker"
+          }
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/nested_markers"
           }
         }
-      }
+      ]
     }
   }
 }

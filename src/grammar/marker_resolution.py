@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from loguru import logger
 
-from src.lexicon import get_roots, get_principal_part_for_all_roots
+from src.lexicon import get_roots, get_principal_part_for_all_roots, get_features_for_root
 from src.yaml_utils.models import (
     Marker,
     UnorderedMarker,
@@ -27,6 +27,7 @@ def get_markers_for_paradigm(
     feature_values: FeatureComboType | dict[str, str],
     paradigm_name: str,
     include_features: bool = False,
+    root: str | None = None,
 ) -> list[Marker] | list[tuple[Marker, FeatureComboType | str]]:
     """
     Get all markers for a requested feature set for a given paradigm.
@@ -55,10 +56,21 @@ def get_markers_for_paradigm(
             f"Feature values {feature_values} not valid for paradigm {paradigm_name}"
         )
 
+    part_of_speech = paradigm_data["part_of_speech"]
+    part_of_speech_data = get_yaml_data_safe(
+        yaml_basename=part_of_speech, kind="PartOfSpeech"
+    )
+    lexical_feature_names = set(part_of_speech_data.get("lexical_features", []))
+
+    if root:
+        lexical_features = set(get_features_for_root(part_of_speech, root))
+        feature_values |= lexical_features
+
     markers = get_markers(
         feature_marker_files=marker_files,
         contingent_feature_marker_files=contingent_files,
         feature_values=feature_values,
+        lexical_feature_names=lexical_feature_names,
     )
 
     # any global markers defined in the paradigm should be applied to all feature combinations
@@ -136,10 +148,16 @@ def get_free_features_for_paradigm(
     name: str, kind: str = "Paradigm"
 ) -> list[str]:
     paradigm_data = get_yaml_data_safe(kind=kind, yaml_basename=name)
-    free_features = []
-    for feature, value in paradigm_data["feature_markers"].items():
-        if isinstance(value, str) and value.startswith("$"):
-            free_features.append(feature)
+    part_of_speech = paradigm_data["part_of_speech"]
+    part_of_speech_data = get_yaml_data_safe(
+        yaml_basename=part_of_speech, kind="PartOfSpeech"
+    )
+    free_features = list(part_of_speech_data.get("features", []))
+
+    for feature, value in paradigm_data.get("feature_markers", {}).items():
+        if value is not None and not (isinstance(value, str) and value.startswith("$")):
+            if feature in free_features:
+                free_features.remove(feature)
 
     return free_features
 
@@ -178,7 +196,8 @@ def get_feature_combos_for_paradigm(
             marker_files.append(ref)
         else:
             fixed[feature_name] = ref
-            free_feature_names.remove(feature_name)
+            if feature_name in free_feature_names:
+                free_feature_names.remove(feature_name)
 
     contingent_files = list(paradigm_data.get("contingent_markers", []))
 
