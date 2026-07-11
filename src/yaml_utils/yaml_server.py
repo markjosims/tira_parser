@@ -390,6 +390,7 @@ def get_markers(
     feature_marker_files: list[str],
     contingent_feature_marker_files: list[str],
     feature_values: set[tuple[str, str]] | dict[str, str],
+    lexical_feature_names: set[str] | None = None,
 ) -> list[tuple[Marker, FeatureComboType]]:
     """
     Query all specified files for markers exponing the requested feature set.
@@ -408,7 +409,10 @@ def get_markers(
     if not feature_values:
         return []
 
-    unexponed_features = {feature for feature, _ in feature_values}
+    if lexical_feature_names is None:
+        lexical_feature_names = set()
+
+    unexponed_features = {feature for feature, _ in feature_values if feature not in lexical_feature_names}
     markers = []
 
     # iterate through contingent feature markers and attempt
@@ -416,17 +420,19 @@ def get_markers(
     # since contingent markers can overlap, order of iteration does not matter
     for contingent_file in contingent_feature_marker_files:
         data = get_yaml_data_safe("ContingentFeatureMarkers", contingent_file)
-        markers_for_file = _get_valid_contingent_markers(data, feature_values)
-        if markers_for_file:
-            contingent_feature_names = data["features"]
+        result = _get_valid_contingent_markers(data, feature_values)
+        if result is not None:
+            realization, matched_features = result
+            contingent_feature_names = data.get("features", [])
+            
+            inflectional_contingent_names = [f for f in contingent_feature_names if f not in lexical_feature_names]
+            unexponed_features -= set(inflectional_contingent_names)
+            
             contingent_feature_values = {
-                value
-                for feature, value in feature_values
-                if feature in contingent_feature_names
+                (f, v) for f, v in matched_features if f not in lexical_feature_names
             }
-            unexponed_features -= set(contingent_feature_names)
             markers.extend(
-                (marker, contingent_feature_values) for marker in markers_for_file
+                (marker, contingent_feature_values) for marker in realization
             )
 
     # attempt to match any remaining features with regular feature markers
@@ -459,17 +465,36 @@ def get_markers(
 
 
 def _get_valid_contingent_markers(
-    data: dict, feature_values: set[FeatureValue]
-) -> tuple[tuple[Marker], set[FeatureValue]] | None:
+    data: dict,
+    feature_values: set[tuple[str, str]] | dict[str, str],
+) -> tuple[list[Marker], set[tuple[str, str]]] | None:
     """
-    Attempt to find a valid contingent marker which is a subset of the requested features.
+    Attempt to find a valid contingent marker which matches the requested features.
     """
-    for marker in data["markers"]:
-        marker_features = set(marker["features"].items())
+    lookup = dict(feature_values)
+    features_list = data.get("features", [])
+    if not features_list:
+        return None
 
-        if marker_features.issubset(feature_values):
-            return marker["realization"], marker_features
-    return None
+    curr = data.get("markers", {})
+    matched_features = set()
+
+    for f in features_list:
+        if f not in lookup:
+            return None
+        val = lookup[f]
+        if not isinstance(curr, dict) or val not in curr:
+            return None
+        curr = curr[val]
+        matched_features.add((f, val))
+
+    if curr is None:
+        return [], matched_features
+
+    if not isinstance(curr, list):
+        return None
+
+    return curr, matched_features
 
 
 def kind_dir(kind: str) -> str:

@@ -117,7 +117,7 @@ def build_inflect_graph(paradigm_name: str) -> pynini.Fst:
         for feature_values in combos:
             try:
                 markers = get_markers_for_paradigm(
-                    feature_values, paradigm_name)
+                    feature_values, paradigm_name, root=root)
                 inflected_output = pynini.project(
                     _apply_markers(root_fsa, markers), project_type="output"
                 )
@@ -356,7 +356,7 @@ def inflect_stages(
         )
 
     marker_tuples = get_markers_for_paradigm(
-        feature_values, name, include_features=True
+        feature_values, name, include_features=True, root=root
     )
 
     initial_stage = InflectStage(
