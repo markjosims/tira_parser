@@ -18,27 +18,27 @@ import os
 import re
 import unicodedata
 from collections import defaultdict
-from graphlib import TopologicalSorter
 from typing import Literal
 
 import pynini
+from graphlib import TopologicalSorter
 from loguru import logger
 from pynini.lib import rewrite
 
+from src.fst_utils import ReservedSymbolMixin as R
 from src.yaml_utils.cache import (
     is_syms_cache_valid,
-    save_symbol_table,
     load_symbol_table,
     observed_cache,
+    save_symbol_table,
 )
-from src.fst_utils import ReservedSymbolMixin as R
 from src.yaml_utils.models import Feature, Inventory, Pattern, Token
 from src.yaml_utils.yaml_server import (
     get_feature_array,
     get_inventory_items,
     get_patterns,
+    kind_dir,
 )
-from src.yaml_utils.yaml_server import kind_dir
 
 """
 ## Symbol table
@@ -316,7 +316,6 @@ def _tokenize_str(
             None,
         )
         if match is None:
-            breakpoint()
             raise ValueError(
                 f"Unrecognized token at position {i} in '{s}' "
                 f"(inferred type: '{token_type}')"

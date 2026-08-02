@@ -1,36 +1,37 @@
-from src.yaml_utils.models import (
-    Marker,
-    Rule,
-    SimpleRule,
-    StringMapRule,
-    RuleSequence,
-    SingleStringMarker,
-    StringTupleMarker,
-    UnorderedMarker,
-    PrincipalPartMarker,
-    OperationTypeStringTuple,
-    OperationTypeSingleString,
-    UnorderedOperation,
-)
-from src.grammar.transducer_compilation import compile_marker
+import os
+from copy import deepcopy
+
+import pynini
+import pytest
+
+import yaml
+from src.constants import PROJECT_ROOT
 from src.grammar.acceptor_compilation import (
-    fsa,
-    word_fsa,
-    fsm_strings,
     filter_strings_by_pattern,
+    fsa,
+    fsm_strings,
     get_pattern_fsts,
+    word_fsa,
 )
 from src.grammar.marker_resolution import get_markers_for_paradigm
+from src.grammar.paradigm_compilation import _get_or_build, inflect, parse, search
+from src.grammar.transducer_compilation import compile_marker, get_rule_fst
 from src.lexicon import get_roots_with_gloss
-import pynini
-import yaml
-from copy import deepcopy
-import pytest
+from src.yaml_utils.models import (
+    Marker,
+    OperationTypeSingleString,
+    OperationTypeStringTuple,
+    PrincipalPartMarker,
+    Rule,
+    RuleSequence,
+    SimpleRule,
+    SingleStringMarker,
+    StringMapRule,
+    StringTupleMarker,
+    UnorderedMarker,
+    UnorderedOperation,
+)
 from src.yaml_utils.yaml_server import get_yaml_data_safe, get_yaml_path
-from src.grammar.paradigm_compilation import inflect, parse, search, _get_or_build
-from src.grammar.transducer_compilation import get_rule_fst
-from src.constants import PROJECT_ROOT
-import os
 
 
 @pytest.fixture

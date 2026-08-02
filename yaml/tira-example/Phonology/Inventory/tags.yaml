@@ -4,22 +4,12 @@
 kind: Inventory
 data:
   # type inv-phones, inv-tags or inv-nested to add more nodes!
-  - name: Stops
-    ref: <Stops>
-    phones: [p, t, c, q, b, d, g]
-  - name: Nasals
-    ref: <N>
-    phones: [m, n, ñ]
-  - name: Fricatives
-    ref: <Frc>
-    phones: [f, v, z, s, h, j, x]
-  - name: Sonorants
-    ref: <Son>
-    phones: [r, l, y, ü]
-  - name: Vowels
-    ref: <V>
-    phones: [a, e, i, o, u, á, é, í, ó, ú]
-
+  - name: Tone flags
+    ref: <ToneFlag>
+    tags: ["[TBU]", "[FLOAT]"]
+  - name: Noun class pairs
+    ref: <NounClass>
+    tags: ["[g/l]", "[ð/j]", "[ð/r]"]
 
 ## HELP FOR INVENTORY ##
 # The inventory is built as a nested tree

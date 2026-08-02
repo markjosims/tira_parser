@@ -4,14 +4,15 @@ kind: Rules
 rules:
 
 # type rule-simple, rule-map or rule-seq to add more rules
-- name: diphthongization
+# note left and right contexts are optional
+- name: assign_tbus
+  kind: simple
   description: >
-    /e/ becomes [ie] and /o/ becomes [ue] in stressed syllables
-    for certain verbs
-  string_map:
-    - [e , ie]
-    - [o , ue]
-  right_context: "<Stress>"
+    Insert a `[TBU]` flag after every vowel or tone-bearing consonant
+  input_pattern:
+  output_pattern: "[TBU]"
+  left_context: "{^<V>}(<V>|<N>|<Glide>|r|l)"
+  right_context: "{^<V>}"
 
 ### HELP FOR RULES ###
 # Here we define context-sensitive phonological rules
