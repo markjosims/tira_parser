@@ -9,6 +9,7 @@ Provides following endpoints:
 
 import os
 
+import msgspec
 import pynini
 import uvicorn
 from fastapi import FastAPI, HTTPException
@@ -229,7 +230,7 @@ def get_patterns_route():
 
 @app.get("/rules")
 def get_rules_route():
-    return [{"name": name, **rule._asdict()} for name, rule in get_rules().items()]
+    return [msgspec.to_builtins(rule) for rule in get_rules().values()]
 
 
 class TestPatternRequest(BaseModel):

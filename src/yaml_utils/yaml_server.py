@@ -212,12 +212,14 @@ def get_rules() -> dict[str, Rule]:
     rules: dict[str, Rule] = {}
 
     for file_path, yaml_data in rules_yaml_data:
-        for rule in yaml_data["rules"]:
-            rule_name = rule.pop("name")
-            if rule_name in rules:
-                logger.exception(f"Duplicate rule found: {rule_name} in {file_path}")
+        for rule_data in yaml_data["rules"]:
+            resolved = resolve_rule(rule_data)
+            if resolved.name in rules:
+                logger.exception(
+                    f"Duplicate rule found: {resolved.name} in {file_path}"
+                )
                 continue
-            rules[rule_name] = resolve_rule(rule)
+            rules[resolved.name] = resolved
 
     return rules
 

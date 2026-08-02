@@ -1,5 +1,7 @@
 from typing import Any, Literal, NamedTuple
 
+import msgspec
+
 
 class InventoryItemContents(NamedTuple):
     """
@@ -36,51 +38,55 @@ class Pattern(NamedTuple):
     name: str | None = None
 
 
-class SimpleRule(NamedTuple):
+class SimpleRule(msgspec.Struct, kw_only=True, frozen=True, tag_field="kind", tag="simple"):
     """
     A context-sensitive rewrite rule.
     """
 
-    input_pattern: str
-    output_pattern: str
+    name: str
+    input_pattern: str | None
+    output_pattern: str | None
     description: str = ""
     left_context: str = ""
     right_context: str = ""
 
 
-class StringMapRule(NamedTuple):
+class StringMapRule(
+    msgspec.Struct, kw_only=True, frozen=True, tag_field="kind", tag="string_map"
+):
     """
     A rule for mapping strings.
     """
 
+    name: str
     string_map: tuple[tuple[str, str], ...]
     description: str = ""
     left_context: str = ""
     right_context: str = ""
 
 
-class RuleSequence(NamedTuple):
+class RuleSequence(
+    msgspec.Struct, kw_only=True, frozen=True, tag_field="kind", tag="rule_sequence"
+):
     """
     A sequence of rules to be applied.
     Here just stored as a list of strings indicating rule names,
     which are resolved to rule data up in `fst_compilation.compile_rule`
     """
 
+    name: str
     rules: tuple[str, ...]
     description: str = ""
 
 
 # A mapping of rule names to their corresponding rule objects.
+# `kind` (declared via tag_field/tag above) discriminates the union on decode --
+# see `resolve_rule` -- instead of the old try-each-constructor sniffing.
 Rule = SimpleRule | StringMapRule | RuleSequence
 
 
 def resolve_rule(data: dict) -> Rule:
-    for rule_class in (SimpleRule, StringMapRule, RuleSequence):
-        try:
-            return rule_class(**data)
-        except:
-            pass
-    raise ValueError(f"Could not resolve rule with data {data}")
+    return msgspec.convert(data, type=Rule)
 
 
 class FeatureValue(NamedTuple):
