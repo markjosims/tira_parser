@@ -22,7 +22,7 @@ feature_markers:
   tense: present
   mood: $mood_markers
 ```
-The 'contingent_features' attribute may be specified alongside 'feature_markers', which imports a `ContingentFeatures` config or list of configs.
+The 'multifeature_features' attribute may be specified alongside 'feature_markers', which imports a `ContingentFeatures` config or list of configs.
 ```yaml
 kind: Paradigm
 part_of_speech: verb
@@ -30,7 +30,7 @@ feature_markers:
   person: $person_suffixes
   tense: $tense_markers
   mood: $mood_stem_vowel
-contingent_markers:
+multifeature_markers:
   - $past_tense_person_markers
 ```
 The 'feature_combinations' attribute may be used to specify what combinations of features are possible for the given paradigm by importing a `FeatureCombinations` config.
@@ -52,7 +52,7 @@ feature_markers:
   person: $person_suffixes
   tense: $tense_stem
   mood: $mood_stem_vowel
-contingent_markers:
+multifeature_markers:
   - $past_tense_person_markers
 ```
 Where the various `FeatureMarkers` and `ContingentFeatureMarkers` configs must reference the stages enumerated in the 'order' attribute.
@@ -71,7 +71,7 @@ filter:
 feature_markers:
   person: $person_suffixes_with_stem_change
   tense: $tense_stems
-contingent_markers:
+multifeature_markers:
   - $past_tense_person_markers
 ```
 We can also select for multiple lexical tags at once, for example if we want to target verb roots that under *n~ng* alternation and *o~ue/e~ie* alternation simultaneously in Spanish.
@@ -85,7 +85,7 @@ filter:
 feature_markers:
   person: $person_suffixes_with_stem_change
   tense: $tense_stems
-contingent_markers:
+multifeature_markers:
   - $past_tense_person_markers
 ```
 We might also select every root that fits some phonological shape using the 'pattern' attr.

@@ -1,4 +1,4 @@
-from src.yaml_utils.models import (
+from src.models import (
     Marker,
     Rule,
     SimpleRule,

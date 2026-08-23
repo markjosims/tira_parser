@@ -32,7 +32,7 @@ from src.yaml_utils.cache import (
     observed_cache,
     save_symbol_table,
 )
-from src.yaml_utils.models import Feature, Inventory, Pattern, Token
+from src.models import Feature, InventoryFile, Pattern, Token
 from src.yaml_utils.yaml_server import (
     get_feature_array,
     get_inventory_items,
@@ -46,7 +46,7 @@ from src.yaml_utils.yaml_server import (
 
 
 def build_symbol_table(
-    inventory: Inventory,
+    inventory: InventoryFile,
     features: tuple[Feature, ...],
 ) -> pynini.SymbolTable:
     syms = pynini.SymbolTable()

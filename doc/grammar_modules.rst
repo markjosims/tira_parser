@@ -94,7 +94,7 @@ The set of inflectional classes are labeled *aɔ*, *ao*, *ai*, *ɔɔ*, *ɔu*, *�
 To represent these classes, we add a feature ``fv_class`` with values ``aɔ, ao`` etc.
 No distinction is made in the Feature Definition module between inflectional or lexical features.
 Rather, their difference lies in how the user applies each feature in various other submodules.
-For example the :doc:`morpheme-set`, :doc:`feature-markers` and :doc:`contingent-feature-markers` modules allow the user to specify particular morphemes (for morpheme set) or morphological operations (for feature markers and contingent feature markers) that make up the realization of some inflectional features.
+For example the :doc:`morpheme-set`, :doc:`feature-markers` and :doc:`multi-feature-feature-markers` modules allow the user to specify particular morphemes (for morpheme set) or morphological operations (for feature markers and multi-feature markers) that make up the realization of some inflectional features.
 Likewise, the :doc:`lexicon` module allows the user to specify a set of inflectional features realized for a given part of speech as well as a set of lexical features that must be specified for each word belonging to that part of speech.
 
 Morpheme Set

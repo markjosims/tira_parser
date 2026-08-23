@@ -12,18 +12,11 @@ Run with: `uv run python -m src.yaml_utils.schema_gen`
 
 import json
 from pathlib import Path
-from typing import Literal
 
 import msgspec
 
 from src.constants import SCHEMA_DIR
-from src.yaml_utils.models import Rule
-
-
-class RulesFile(msgspec.Struct, kw_only=True):
-    kind: Literal["Rules"]
-    rules: tuple[Rule, ...]
-    source_path: str | None = None
+from src.models import Rule, RulesFile
 
 
 def generate_rules_schema() -> dict:

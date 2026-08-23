@@ -90,14 +90,16 @@ def grammar_stats() -> dict:
     feature_markers_stats["inflection_stages"] = len(get_inflection_stages())
     grammar_stats["feature_markers"] = feature_markers_stats
 
-    contingent_markers_stats = {}
-    contingent_markers_yaml = get_yaml_kind("ContingentFeatureMarkers")
-    contingent_markers_stats["files"] = len(contingent_markers_yaml["valid"])
-    contingent_markers_stats["invalid_files"] = len(contingent_markers_yaml["invalid"])
-    contingent_markers_stats["total"] = sum(
-        len(file["markers"]) for _, file in contingent_markers_yaml["valid"]
+    multifeature_markers_stats = {}
+    multifeature_markers_yaml = get_yaml_kind("ContingentFeatureMarkers")
+    multifeature_markers_stats["files"] = len(multifeature_markers_yaml["valid"])
+    multifeature_markers_stats["invalid_files"] = len(
+        multifeature_markers_yaml["invalid"]
     )
-    grammar_stats["contingent_markers"] = contingent_markers_stats
+    multifeature_markers_stats["total"] = sum(
+        len(file["markers"]) for _, file in multifeature_markers_yaml["valid"]
+    )
+    grammar_stats["multifeature_markers"] = multifeature_markers_stats
 
     patterns_stats = {}
     patterns_yaml = get_yaml_kind("Patterns")

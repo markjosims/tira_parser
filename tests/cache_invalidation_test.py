@@ -17,7 +17,7 @@ from src.grammar.marker_resolution import get_markers_for_paradigm
 from src.grammar.paradigm_compilation import _get_or_build, inflect, parse, search
 from src.grammar.transducer_compilation import compile_marker, get_rule_fst
 from src.lexicon import get_roots_with_gloss
-from src.yaml_utils.models import (
+from src.models import (
     Marker,
     OperationTypeSingleString,
     OperationTypeStringTuple,
@@ -115,11 +115,13 @@ def test_rule_invalidation_from_rule_file(restore_diphthongization_rule):
 
     # second test: edit the yaml data so rule output changes
 
-    diphthongization_rule_index = [
-        i
-        for i, rule in enumerate(yaml_data["rules"])
-        if rule["name"] == "diphthongization"
-    ][0]
+    diphthongization_rule_index = next(
+        [
+            i
+            for i, rule in enumerate(yaml_data["rules"])
+            if rule["name"] == "diphthongization"
+        ]
+    )
 
     yaml_data["rules"][diphthongization_rule_index]["string_map"] = [
         ["e", "eee"],

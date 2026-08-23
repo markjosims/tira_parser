@@ -11,7 +11,7 @@ from __future__ import annotations
 import pynini
 
 from src.fst_utils import ReservedSymbolMixin as R
-from src.yaml_utils.models import (
+from src.models import (
     Marker,
     Rule,
     SimpleRule,

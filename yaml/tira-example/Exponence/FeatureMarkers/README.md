@@ -149,7 +149,7 @@ This is done in the `Paradigm` config, see the [documentation](config/paradigms/
 
 ## Composition and inheritance
 Other YAML configs can be imported into the current file.
-In [ContingentFeatureMarkers](#contingentfeaturemarkers) we demonstrate an example of this by importing a `FeatureMarkers` subparadigm into a `ContingentFeatureMarkers` config.
+In [ContingentFeatureMarkers](#multifeaturefeaturemarkers) we demonstrate an example of this by importing a `FeatureMarkers` subparadigm into a `ContingentFeatureMarkers` config.
 This can also be done at the head of the file with the 'inherits' attribute, e.g.:
 ```yaml
 # person_markers_oy_1sg_present.yaml
