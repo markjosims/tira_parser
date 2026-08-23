@@ -3,7 +3,11 @@
   "title": "PartOfSpeech",
   "description": "Configuration defining the metadata, inflectional features, and lexical attributes for a specific part of speech.",
   "type": "object",
-  "required": ["kind", "name", "features"],
+  "required": [
+    "kind",
+    "name",
+    "features"
+  ],
   "properties": {
     "source_path": {
       "type": "string",
@@ -11,7 +15,9 @@
     },
     "kind": {
       "type": "string",
-      "enum": ["PartOfSpeech"]
+      "enum": [
+        "PartOfSpeech"
+      ]
     },
     "name": {
       "type": "string",

@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "ContingentFeatureMarkers",
-  "description": "Schema for morphological realizations contingent on multiple features.",
+  "description": "Schema for morphological realizations multi-feature on multiple features.",
   "type": "object",
   "required": [
     "kind",

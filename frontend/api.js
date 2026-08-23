@@ -8,6 +8,7 @@ export async function fetchGrammarStats() {
   return res.json();
 }
 
+
 export async function fetchInflectionMeta() {
   const res = await fetch("/inflection-meta");
   if (!res.ok) throw new Error(`inflection meta: ${res.status}`);

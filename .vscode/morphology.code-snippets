@@ -18,7 +18,7 @@
       "    stage: ${2:(OPTIONAL) marker order}"
     ]
   },
-  "Contingent Feature Markers: item": {
+  "Multi Feature Markers: item": {
     "scope": "yaml",
     "prefix": "cfm-item",
     "body": [
@@ -32,7 +32,7 @@
       "    stage: ${8:(OPTIONAL) marker order}"
     ]
   },
-  "Contingent Feature Markers: additional marker": {
+  "Multi Feature Markers: additional marker": {
     "scope": "yaml",
     "prefix": "cfm-add",
     "body": [
@@ -141,11 +141,11 @@
       "  pattern: \"${3:pattern}\""
     ]
   },
-  "Paradigm: contingent markers": {
+  "Paradigm: multi-feature markers": {
     "scope": "yaml",
     "prefix": "para-ctgt",
     "body": [
-      "contingent_markers: ",
+      "multifeature_markers: ",
       "- \\$$1"
     ]
   },

@@ -4,71 +4,48 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-This is **parC**, a toolkit for building and applying morphological analyzers (finite-state-transducer-based parsers) from linguistic fieldwork data.
-
-There is no committed git history yet (`main` has no commits); treat the working tree as the source of truth rather than `git log`/`git blame`.
+**parC** (Paradigm Compiler) is a toolkit for building and applying morphological analyzers (finite-state-transducer-based parsers) from linguistic fieldwork data. The grammar model is entirely config-driven (YAML validated against JSON Schemas) and the Python side is written in a functional style — plain functions over immutable `NamedTuple`/dict data, no class hierarchies for the grammar/compilation logic.
 
 ## Commands
 
-- Install deps: `uv sync` (or `pip install -e .`) — this is a `uv`-managed project (`uv.lock` present).
-- Validate config YAML against JSON schemas: `python -m src.config_utils.schema_validation` (runs `validate_files_by_kind` for every `CONFIG_KINDS` entry against `config/` by default).
-- Tests: there is no test suite in the repo currently (`pytest` is a declared dependency but no `test_*.py` files exist yet). When adding tests, `pytest` is already available via the project's dependencies.
-- The `tira` CLI entry point is declared in `pyproject.toml` (`tira = "src.cli:main"`) but `src/cli.py` does not currently exist — don't assume it's runnable until it's (re)added.
-- Required environment: a config directory must be available via `YAML_DIR` in `.env` (e.g. `YAML_DIR=config/tira` or `config/example`), since `ConfigWalker` reads from it on construction. `PARC_LOG_LEVEL`/`TIRA_LOG_OUTPUT` env vars control `loguru` logging (see `src/__init__.py`).
+- Install deps: `uv sync` (`uv.lock` is canonical; `pyproject.toml` pins `pynini==2.1.6` and `requires-python = ">=3.8, <3.11"` — the checked-in `.venv` is 3.10, don't assume a newer interpreter works).
+- Run the app: `uv run parC` (the `parC` console script → `src.api:run_app`), or directly `uv run uvicorn src.api:app --reload --port 8000`. `src/launcher.py` is stale/non-functional (broken import, checks a literal string instead of `YAML_DIR`) — don't use it as an entry point.
+- Run tests: `YAML_DIR=yaml/spanish-example uv run pytest`. You must set `YAML_DIR` explicitly — `pyproject.toml` has a `[pytest]` `env_files = [".test.env"]` section intended to set `YAML_DIR=yaml/spanish-example` automatically, but the `pytest-env` plugin it depends on isn't installed, so it's a no-op. Without the explicit env var, `parC.env`'s `YAML_DIR=yaml/tira-example` wins by default and tests fail (they're written against the `spanish-example` dataset, e.g. rule name `diphthongization`, pattern `word_final_coda`).
+- Run a single test: `YAML_DIR=yaml/spanish-example uv run pytest tests/transduction_test.py::test_suffix`.
+- Which YAML dataset loads is controlled by `YAML_DIR` (`src/constants.py::get_yaml_dir`, falls back to `parC.env`, then to `yaml/spanish-example`). Two example datasets ship in-repo: `yaml/spanish-example` and `yaml/tira-example`.
+- Logging: `PARC_LOG_LEVEL` (default `INFO`) and `TIRA_LOG_OUTPUT` (`stdout`/`stderr`) control `loguru` output (`src/__init__.py`).
+- There's no dedicated CLI for bulk schema validation — validation happens automatically whenever config is read, via `get_yaml_data_safe`/`get_yaml_kind` (`src/yaml_utils/yaml_server.py`), which validate each file against `schemas/<Kind>.json` on load.
 
 ## Architecture
 
-### Config-driven grammar model
+### Data lifecycle: YAML → validated dict → typed data → compiled FST → API → frontend
 
-The core domain model is built entirely from YAML config files (validated against JSON Schemas in `schemas//`) describing a language's grammar. A given language's configs live under `config/<language>/<kind_dir>/*.yaml` (e.g. `config/tira/`, `config/spanish/`, `config/example/`), with one subdirectory per **config kind**: `inventory`, `patterns`, `rules`, `feature_definitions`, `feature_combinations`, `morpheme_set`, `feature_markers`, `contingent_feature_markers` (dir named `contingent_marker`), `part_of_speech`, `morpheme_sequence`, `paradigm`.
+1. **Reading + validation** — `src/yaml_utils/yaml_server.py` reads YAML files under `YAML_DIR`, validates each against a hand-authored JSON Schema in `schemas/<Kind>.json` (`src/yaml_utils/schema_validation.py::validate_yaml`), and returns plain dicts. `CONFIG_KINDS` enumerates the active kinds; `FeatureCombinations`, `MorphemeSequence`, and `MorphemeSet` have schemas in `schemas/` but are commented out of `CONFIG_KINDS` as buggy/unimplemented — don't assume they work end-to-end (the morpheme-sequence UI is correspondingly commented out in `frontend/index.html`).
+2. **Typed resolution** — dicts for rules/markers are resolved into `NamedTuple` domain types in `src/yaml_utils/models.py` (`Rule = SimpleRule | StringMapRule | RuleSequence`, `Marker = SingleStringMarker | StringTupleMarker | UnorderedMarker | PrincipalPartMarker`) via `resolve_rule`/`resolve_marker`. These pick a variant by trying each `NamedTuple` constructor in turn and catching failures, not via an explicit discriminator field for rules — field names can and do drift from the JSON Schema (e.g. the schema's `rule_sequence` vs. the `RuleSequence` NamedTuple's `rules` field), so check both sides when changing a rule/marker shape.
+3. **FST compilation**, in dependency order:
+   - `src/grammar/acceptor_compilation.py` — builds the `pynini.SymbolTable` from inventory phones/tags + feature values, special FSAs (sigma, phone, flag, boundary...), a token map for the pattern-string DSL, and compiles pattern strings (`fsa()`, `word_fsa()`) via a hand-written recursive-descent parser over the operators in `ReservedSymbolMixin` (`src/fst_utils.py`).
+   - `src/grammar/transducer_compilation.py` — compiles `Rule`s into `pynini.cdrewrite` FSTs and `Marker`s into prefix/suffix/suppletion/replace/rule/string-map FSTs, built on `acceptor_compilation`'s `fsa`/symbol table.
+   - `src/grammar/marker_resolution.py` — given a paradigm + feature-value combo, resolves which markers apply (multi-feature markers first, then regular feature markers for remaining features, then global/principal-part markers), including resolving `principal_part` markers into a string-map marker via the lexicon (`src/lexicon.py`).
+   - `src/grammar/paradigm_compilation.py` — builds per-paradigm `inflect`/`parse`/`search_lexicon`/`search_left_factor` FSTs by applying resolved markers to every root × feature-combo, and exposes the public `inflect`/`parse`/`search`/`inflect_stages` functions consumed by the API.
+4. `src/api.py` — FastAPI app exposing `grammar-stats`/`inflection-meta`/`roots`/`lexical-features`/`patterns`/`rules`/`test-pattern`/`test-rule`/`inflect`/`parse`/`search`, and mounts `frontend/` as static files at `/`.
+5. `frontend/` — plain ES-module JS, no build step. `api.js` is the only file that calls `fetch`; `hub.js`/`inflect.js`/`parse.js`/`tests.js` drive the tab-based UI defined in `index.html`.
 
-- `src/config_utils/config_walker.py` (`ConfigWalker`) reads and validates all YAML for a config dir against schemas, normalizes kind names (PascalCase → `snake_case` + `_configs` suffix, e.g. `FeatureMarkers` → `feature_markers_configs`), and resolves `$name` cross-file references (a string starting with `$` is replaced by the referenced YAML file's content, resolved recursively).
-- `src/config_utils/schema_validation.py` loads/validates JSON Schemas from `schemas//`, including resolving cross-schema `$ref`s into local definitions (custom resolver, not `jsonref`, to avoid recursion issues).
-- `src/config_utils/watcher.py` watches the config directory for changes and triggers invalidation/reload of cached state.
+### Caching — two independent layers
 
-### Reading vs. loading
+- **In-memory**: `@observed_cache([dirs...])` (`src/yaml_utils/cache.py`) wraps `functools.lru_cache` and additionally invalidates whenever the max mtime across the given source directories advances; args/kwargs are coerced to hashable equivalents (`list`→`tuple`, `dict`→`frozendict`) before hitting the cache. Used throughout `acceptor_compilation.py`/`transducer_compilation.py`/`paradigm_compilation.py`.
+- **On-disk**: the symbol table and per-paradigm FSTs also persist under `<YAML_DIR>/.cache/` (`symbol_table.syms`, `Paradigm/{name}.{fst_kind}.fst`), validated against source-file mtimes the same way (`is_syms_cache_valid`/`is_fst_cache_valid`).
+- `tests/cache_invalidation_test.py` exercises both invalidation paths by writing to real YAML files under `YAML_DIR` and restoring them via fixtures — if a test run is interrupted, check `git status` under `yaml/` for leftover mutations.
 
-Per `src/grammar/classes.py`, grammar construction happens in two stages:
-1. **Reading** — `ConfigWalker` reads YAML into plain dicts. No interpretation.
-2. **Loading** — `Orchestrator`/`Registry` subclasses interpret that data into actionable logic (e.g. inventory phones get compiled into `pynini` FSTs).
+### Config directory taxonomy
 
-Two base classes anchor this:
-- `Registry` (`src/grammar/classes.py`) holds all data for one config kind. Subclasses implement `load_all_configs()` and `load_data_from_config()`.
-- `Orchestrator` sits above a group of `Registry` instances for one area of grammar (currently no shared logic — organizational only).
+Per-language config lives under `yaml/<language>-example/<ParDir>/<Kind>/*.yaml`, e.g. `yaml/spanish-example/Phonology/Rules/vowel_alternations.yaml`. `CONFIG_KIND_TO_PARDIR` (`src/yaml_utils/schema_validation.py`) maps each kind to its parent dir: `Inventory`/`Patterns`/`Rules` → `Phonology`; `FeatureDefinitions`/`FeatureMarkers`/`ContingentFeatureMarkers` → `Exponence`; `Paradigm` → `Morphotactics`; `PartOfSpeech`/`Wordlists` → `Lexicon`.
 
-### Orchestrator/Registry tree
+Lexicon word lists (`Lexicon/Wordlists/*.csv`/`.xlsx`) are the one config surface *not* validated against a JSON Schema — `src/lexicon.py` reads them directly via pandas, cross-referencing `lexical_features`/`principal_parts` declared in the corresponding `PartOfSpeech` YAML, and auto-creates an empty CSV with the right columns if the wordlist is missing.
 
-`src/grammar/orchestrator/grammar_orchestrator.py` defines `Grammar`, the top-level orchestrator-of-orchestrators, constructed from all `*_configs` dicts produced by `ConfigWalker`. It wires together (in dependency order):
+### Pattern-string DSL
 
-- `FeatureOrchestrator` (`feature_orchestrator.py`) — morphological features and their values/combinations.
-- `FstOrchestrator` (`fst_orchestrator.py`, the largest file in the codebase) — compiles phoneme inventory, patterns, and phonological rules into `pynini` FSTs; depends on `FeatureOrchestrator`.
-- `LexiconRegistry` — parts of speech / lexical roots; depends on `FeatureOrchestrator` + `FstOrchestrator`.
-- `MarkerOrchestrator` (`marker_orchestrator.py`) — feature markers and contingent feature markers (morphological exponence); depends on `FeatureOrchestrator`.
-- `MorphemeSetRegistry` — sets of morphemes exponing feature combinations; depends on `FeatureOrchestrator` + `FstOrchestrator`.
-- `ParadigmRegistry` (`paradigm_registry.py`, largest registry) — inflectional paradigms; depends on `MarkerOrchestrator`, `LexiconRegistry`, `FstOrchestrator`.
-- `MorphemeSequenceRegistry` — morphotactic sequencing of morphemes within a word; depends on everything above. Its `initialize_sequences()` is deliberately called last, after all other registries exist (see `Grammar.initialize()`).
+Inventory classes, Patterns, and morpheme/rule contexts all share one regex-like DSL: `<ClassName>` references an inventory class or named pattern, `|` is disjunction, `{A B}` is union of literal tokens, `*`/`+`/`?` are closures, `^` negates inside `{}`. Reserved operators/symbols live in `ReservedSymbolMixin` (`src/fst_utils.py`). See `doc/grammar_modules.rst` for the linguistic rationale behind the phonology/exponence/morphotactics module split.
 
-When extending the grammar model, follow this same dependency order — most registries take already-constructed orchestrators/registries as constructor args rather than reaching into global state.
+### `src/search/` — in-progress replacement for the paradigm-compilation search path
 
-### FST utilities and parsing/search
-
-- `src/fst_utils.py` defines `ReservedSymbolMixin` (the fixed set of special symbols/operators used across pattern strings, rules, and morpheme definitions — e.g. `[BOW]`/`[EOW]` word-boundary tags, edit-operation tags `[INSERT]`/`[SUBSTITUTE]`/`[DELETE]`, boundary symbols `-`/`=`/`_`, and operators `*`, `+`, `?`, `|`, `^`, parens, braces) plus `Acceptor`/`Transducer`/`TransducerList`/`Prefix`/`Suffix` wrapper dataclasses around `pynini.Fst` objects. These wrappers enforce a "build once" discipline (`set_acceptor`/`set_transducer` raise/warn if called more than once or on the wrong FST type).
-- `src/search/` implements fuzzy form search and parsing over the compiled FSTs: `beam_search.py` / `beam_search_jit.py` (numba-jitted variant) implement beam search for matching surface forms against the parser despite edits/errors; `edit_graph.py` and `edit_modeling.py` model edit operations for that search. `beam_search_jit_stale.py` is a stale/superseded variant — check before using.
-
-### Pattern strings
-
-Pattern strings (used in inventory classes, the Patterns module, morpheme definitions, and rule contexts) form a small regex-like DSL over phones/symbols using the operators captured in `ReservedSymbolMixin`: `<ClassName>` references an inventory class or named pattern, `|` is disjunction, `{A B}` is union/optionality of literal tokens, `*`/`+`/`?` are the usual closures, and `^` negates inside braces. See `doc/grammar_modules.rst` for the linguistic rationale (phonology vs. exponence vs. morphotactics module split) — this doc is the closest thing to a design doc and is useful background before changing the schemas in `schemas//`.
-
-### Constants
-
-`src/constants.py` defines path constants (`PROJECT_ROOT`, `CONFIG_ROOT`, `EXAMPLE_YAML_DIR`, `TIRA_YAML_DIR`, `SCHEMA_DIR`) and two `pynini`-specific symbol-table indices (`BOS_INDEX`, `EOS_INDEX`) copied from upstream `pynini` source — don't change these without checking `pynini`'s `stringcompile.h`.
-
-### Planned: JSON Config Editor (PoC)
-
-`plans/jsoneditor.md` specifies a not-yet-built browser-based editor for the typed JSON/YAML config files (replacement for the deprecated Streamlit UI). Read that file in full before implementing any part of it. Key points:
-
-- **Stack:** vanilla JS ES modules (no build step), `vanilla-jsoneditor` + bundled AJV via CDN on the frontend; a FastAPI backend exposing 4 endpoints: `GET /schemas/{kind}`, `GET /configs?type={Type}`, `GET /file?path=`, `PUT /file?path=`. `/configs` returns `$`-prefixed reference strings (e.g. `$rules/verbal.json`) matching the config convention used by `ConfigWalker.resolve_ref`.
-- **Strict module boundaries** — each frontend file owns exactly one concern: `api.js` (only file that calls `fetch`), `schema.js` (schema fetching/caching + cross-`$ref` resolution + injecting live filesystem enums via `patchRefEnums`), `templates.js` (hardcoded `TEMPLATES` map per `kind`, not derived from the schema), `editor.js` (only file importing `vanilla-jsoneditor`; one editor instance at a time, destroyed before remount), `main.js` (orchestrates `openFile`/`saveFile`, delegates everything else).
-- `kind` is the sole dispatch key for which schema/templates/patches apply — every config file has one.
-- `schemaDefinitions` (a `{ './Other.json': schema }` map) must be passed to both the editor and the AJV validator, since e.g. `Paradigm.json` cross-references `./FeatureMarkers.json#/definitions/marker`; omitting it makes those fields silently skip validation.
-- `additionalProperties` fields with open-ended string keys (`FeatureMarkers.markers`, `Paradigm.feature_markers`) intentionally get no key autocompletion in the PoC.
+`src/search/` (`beam_search.py`, `beam_search_jit.py`, `edit_graph.py`, `edit_modeling.py`) implements a numba-jitted beam search over the compiled FSTs, intended to eventually replace the search path in `paradigm_compilation.py`. It is not yet wired into `src/api.py` — the live fuzzy-search path today is `build_search_lexicon_and_leftfactor`/`search` in `src/grammar/paradigm_compilation.py`. `beam_search_jit_stale.py` is a superseded variant of `beam_search_jit.py` — check before using either.

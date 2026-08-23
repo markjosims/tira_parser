@@ -11,7 +11,7 @@ from __future__ import annotations
 import pynini
 
 from src.fst_utils import ReservedSymbolMixin as R
-from src.yaml_utils.models import (
+from src.models import (
     Marker,
     Rule,
     SimpleRule,
@@ -42,8 +42,7 @@ RULES_DIR = kind_dir("Rules")
 
 def _compile_simple_rule(rule: SimpleRule) -> pynini.Fst:
     sigma_star = get_sigma_star()
-    tau = pynini.cross(fsa(rule.input_pattern),
-                       fsa(rule.output_pattern)).optimize()
+    tau = pynini.cross(fsa(rule.input_pattern), fsa(rule.output_pattern)).optimize()
     l = fsa(rule.left_context) if rule.left_context else ""
     r = fsa(rule.right_context) if rule.right_context else ""
     return pynini.cdrewrite(tau, l, r, sigma_star)

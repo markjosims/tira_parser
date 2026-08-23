@@ -11,39 +11,37 @@ and for loading specific objects from YAML files, viz:
 - rules (rules/*.yaml)
 - patterns (patterns/*.yaml)
 - inventory items (inventory/*.yaml)
-- markers (feature_markers/*.yaml, contingent_feature_markers/*.yaml)
-- inflection stages (feature_markers/*.yaml, contingent_feature_markers/*.yaml)
+- markers (feature_markers/*.yaml, multifeature_feature_markers/*.yaml)
+- inflection stages (feature_markers/*.yaml, multifeature_feature_markers/*.yaml)
 - features (feature_definitions/*.yaml)
 """
 
 import os
 
-from loguru import logger
-import yaml
 from frozendict import frozendict
+from loguru import logger
 
-from src.yaml_utils.schema_validation import (
-    validate_yaml,
-    CONFIG_KINDS,
-    CONFIG_KIND_TO_PARDIR,
-)
+import yaml
 from src.constants import get_yaml_dir
-from src.yaml_utils.models import (
-    Inventory,
-    InventoryItemMapType,
-    InventoryItemContents,
-    Marker,
-    resolve_marker,
-    Pattern,
-    Rule,
-    resolve_rule,
-    SimpleRule,
-    StringMapRule,
-    RuleSequence,
+from src.models import (
     Feature,
     FeatureValue,
-    UnorderedMarker,
+    InventoryFile,
+    Marker,
+    Pattern,
     PrincipalPartMarker,
+    Rule,
+    RuleSequence,
+    SimpleRule,
+    StringMapRule,
+    UnorderedMarker,
+    resolve_marker,
+    resolve_rule,
+)
+from src.yaml_utils.schema_validation import (
+    CONFIG_KIND_TO_PARDIR,
+    CONFIG_KINDS,
+    validate_yaml,
 )
 
 """
@@ -51,7 +49,7 @@ from src.yaml_utils.models import (
 """
 
 
-def get_yaml_data_safe(kind: str, yaml_basename: str) -> dict:
+def get_yaml_data_safe(kind: str, yaml_basename: str) -> dict | None:
     """
     Load a single YAML file and validate its contents against the expected schema.
     Returns None if the config kind is invalid or the YAML data fails validation,
@@ -68,8 +66,7 @@ def get_yaml_data_safe(kind: str, yaml_basename: str) -> dict:
 
     yaml_data = validate_yaml(target_kind=kind, data=yaml_data)
     if yaml_data is None:
-        logger.error(
-            f"Failed to validate YAML data from path: {yaml_file_path}")
+        logger.error(f"Failed to validate YAML data from path: {yaml_file_path}")
         return None
 
     return yaml_data
@@ -87,7 +84,7 @@ def get_yaml_path(kind, yaml_basename):
     return yaml_file_path
 
 
-def get_yaml_kind(kind: str) -> dict[str, list[tuple[str, dict] | str]]:
+def get_yaml_kind(kind: str) -> dict[str, list[tuple[str, dict] | str]] | None:
     """
     Loads all YAML files for a given config kind and returns a dictionary
     with shape:
@@ -99,8 +96,7 @@ def get_yaml_kind(kind: str) -> dict[str, list[tuple[str, dict] | str]]:
     if kind not in CONFIG_KINDS:
         logger.error(f"Invalid config kind: {kind}")
         return None
-    yaml_pardir = os.path.join(
-        get_yaml_dir(), CONFIG_KIND_TO_PARDIR[kind], kind)
+    yaml_pardir = os.path.join(get_yaml_dir(), CONFIG_KIND_TO_PARDIR[kind], kind)
     yaml_files = [f for f in os.listdir(yaml_pardir) if f.endswith(".yaml")]
     result = {"valid": [], "invalid": []}
     for yaml_file in yaml_files:
@@ -156,8 +152,7 @@ def get_inventory_items() -> Inventory:
             item_phones, item_tags = extract_phones_and_tags(item_data)
             # BUG: not adding refs recursively
             if item_ref in inventory_items:
-                logger.exception(
-                    f"Duplicate item found: {item_ref} in {file_path}")
+                logger.exception(f"Duplicate item found: {item_ref} in {file_path}")
                 continue
             inventory_items[item_ref] = InventoryItemContents(
                 phones=tuple(item_phones), tags=tuple(item_tags)
@@ -215,13 +210,14 @@ def get_rules() -> dict[str, Rule]:
     rules: dict[str, Rule] = {}
 
     for file_path, yaml_data in rules_yaml_data:
-        for rule in yaml_data["rules"]:
-            rule_name = rule.pop("name")
-            if rule_name in rules:
+        for rule_data in yaml_data["rules"]:
+            resolved = resolve_rule(rule_data)
+            if resolved.name in rules:
                 logger.exception(
-                    f"Duplicate rule found: {rule_name} in {file_path}")
+                    f"Duplicate rule found: {resolved.name} in {file_path}"
+                )
                 continue
-            rules[rule_name] = resolve_rule(rule)
+            rules[resolved.name] = resolved
 
     return rules
 
@@ -267,8 +263,7 @@ def get_feature_array() -> tuple[Feature]:
     for _, yaml_data in features_yaml_data:
         for feature_name, feature_data in yaml_data["features"].items():
             features.append(
-                Feature(name=feature_name, values=tuple(
-                    feature_data) + ("unmarked",))
+                Feature(name=feature_name, values=tuple(feature_data) + ("unmarked",))
             )
 
     return tuple(features)
@@ -297,8 +292,8 @@ def get_inflection_stages() -> set[str]:
             if marker_data and "stage" in marker_data:
                 infleciton_stages.add(marker_data["stage"])
 
-    contingent_feature_marker_yaml = get_yaml_kind("ContingentFeatureMarkers")
-    for _, yaml_data in contingent_feature_marker_yaml["valid"]:
+    multifeature_feature_marker_yaml = get_yaml_kind("ContingentFeatureMarkers")
+    for _, yaml_data in multifeature_feature_marker_yaml["valid"]:
         for marker_data in yaml_data["markers"]:
             if marker_data and "stage" in marker_data:
                 infleciton_stages.add(marker_data["stage"])
@@ -315,7 +310,7 @@ and feature specific.
 
 def validate_requested_marker_files(
     feature_marker_files: list[str],
-    contingent_feature_marker_files: list[str],
+    multifeature_feature_marker_files: list[str],
     requested_features: set[str],
 ) -> bool:
     """
@@ -346,8 +341,7 @@ def validate_requested_marker_files(
         data = resolved_yaml[0]
         feature = data["feature"]
         if feature in covered_features:
-            logger.exception(
-                f"Found duplicate marker files for feature {feature}.")
+            logger.exception(f"Found duplicate marker files for feature {feature}.")
             return False
         if feature not in requested_features:
             logger.exception(
@@ -356,16 +350,16 @@ def validate_requested_marker_files(
             return False
         covered_features.add(feature)
 
-    contingent_marker_yaml = get_yaml_kind("ContingentFeatureMarkers")
-    for marker_file in contingent_feature_marker_files:
-        if marker_file in contingent_marker_yaml["invalid"]:
+    multifeature_marker_yaml = get_yaml_kind("ContingentFeatureMarkers")
+    for marker_file in multifeature_feature_marker_files:
+        if marker_file in multifeature_marker_yaml["invalid"]:
             logger.exception(
                 f"Cannot perform inflection as source ContingentFeatureMarkers file {marker_file} is invalid."
             )
             return False
         resolved_yaml = [
             data
-            for filename, data in contingent_marker_yaml["valid"]
+            for filename, data in multifeature_marker_yaml["valid"]
             if filename == marker_file
         ]
         if not resolved_yaml:
@@ -376,7 +370,7 @@ def validate_requested_marker_files(
         for feature in features:
             if feature not in requested_features:
                 logger.exception(
-                    f"Found contingent marker file for feature {feature} outside of requested features."
+                    f"Found multi-feature marker file for feature {feature} outside of requested features."
                 )
                 return False
 
@@ -388,18 +382,18 @@ FeatureComboType = set[tuple[str, str]]
 
 def get_markers(
     feature_marker_files: list[str],
-    contingent_feature_marker_files: list[str],
+    multifeature_feature_marker_files: list[str],
     feature_values: set[tuple[str, str]] | dict[str, str],
 ) -> list[tuple[Marker, FeatureComboType]]:
     """
     Query all specified files for markers exponing the requested feature set.
-    Selects contingent feature markers first, then regular feature markers
+    Selects multi-feature markers first, then regular feature markers
     for any features that still need to be exponed.
 
-    Overlap is allowed between different sets of contingent markers (e.g. if
-    one contingent marker set expones number and person and another expones
+    Overlap is allowed between different sets of multi-feature markers (e.g. if
+    one multi-feature marker set expones number and person and another expones
     person and gender, then both may be selected) but overlap is NOT allowed between
-    contingent marker sets and regular marker sets, or between different regular marker sets.
+    multi-feature marker sets and regular marker sets, or between different regular marker sets.
     """
 
     if isinstance(feature_values, (dict, frozendict)):
@@ -411,22 +405,22 @@ def get_markers(
     unexponed_features = {feature for feature, _ in feature_values}
     markers = []
 
-    # iterate through contingent feature markers and attempt
+    # iterate through multi-feature markers and attempt
     # to match any valid markers within
-    # since contingent markers can overlap, order of iteration does not matter
-    for contingent_file in contingent_feature_marker_files:
-        data = get_yaml_data_safe("ContingentFeatureMarkers", contingent_file)
-        markers_for_file = _get_valid_contingent_markers(data, feature_values)
+    # since multi-feature markers can overlap, order of iteration does not matter
+    for multifeature_file in multifeature_feature_marker_files:
+        data = get_yaml_data_safe("ContingentFeatureMarkers", multifeature_file)
+        markers_for_file = _get_valid_multifeature_markers(data, feature_values)
         if markers_for_file:
-            contingent_feature_names = data["features"]
-            contingent_feature_values = {
+            multifeature_feature_names = data["features"]
+            multifeature_feature_values = {
                 value
                 for feature, value in feature_values
-                if feature in contingent_feature_names
+                if feature in multifeature_feature_names
             }
-            unexponed_features -= set(contingent_feature_names)
+            unexponed_features -= set(multifeature_feature_names)
             markers.extend(
-                (marker, contingent_feature_values) for marker in markers_for_file
+                (marker, multifeature_feature_values) for marker in markers_for_file
             )
 
     # attempt to match any remaining features with regular feature markers
@@ -450,19 +444,17 @@ def get_markers(
                 )
 
     if unexponed_features:
-        raise ValueError(
-            "Provided marker sets do not support requested feature set")
+        raise ValueError("Provided marker sets do not support requested feature set")
 
-    markers = [(resolve_marker(marker), feature_set)
-               for marker, feature_set in markers]
+    markers = [(resolve_marker(marker), feature_set) for marker, feature_set in markers]
     return markers
 
 
-def _get_valid_contingent_markers(
+def _get_valid_multifeature_markers(
     data: dict, feature_values: set[FeatureValue]
 ) -> tuple[tuple[Marker], set[FeatureValue]] | None:
     """
-    Attempt to find a valid contingent marker which is a subset of the requested features.
+    Attempt to find a valid multi-feature marker which is a subset of the requested features.
     """
     for marker in data["markers"]:
         marker_features = set(marker["features"].items())

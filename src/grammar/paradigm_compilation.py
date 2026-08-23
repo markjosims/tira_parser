@@ -116,8 +116,7 @@ def build_inflect_graph(paradigm_name: str) -> pynini.Fst:
         root_fsa = word_fsa(root)
         for feature_values in combos:
             try:
-                markers = get_markers_for_paradigm(
-                    feature_values, paradigm_name)
+                markers = get_markers_for_paradigm(feature_values, paradigm_name)
                 inflected_output = pynini.project(
                     _apply_markers(root_fsa, markers), project_type="output"
                 )
@@ -129,8 +128,7 @@ def build_inflect_graph(paradigm_name: str) -> pynini.Fst:
 
             feature_str = stringify_features(feature_values)
             inflect_input = (
-                pynini.concat(root_fsa, fsa(feature_str)
-                              ) if feature_str else root_fsa
+                pynini.concat(root_fsa, fsa(feature_str)) if feature_str else root_fsa
             )
             inflect_fsts.append(
                 pynini.cross(inflect_input, inflected_output).optimize()
@@ -230,12 +228,8 @@ def _get_or_build(
 
     inflect = build_inflect_graph(paradigm_name)
     parse = build_parse_graph(inflect)
-    search_lexicon, search_left_factor = build_search_lexicon_and_leftfactor(
-        inflect
-    )
-    _save_paradigm(
-        paradigm_name, inflect, parse, search_lexicon, search_left_factor
-    )
+    search_lexicon, search_left_factor = build_search_lexicon_and_leftfactor(inflect)
+    _save_paradigm(paradigm_name, inflect, parse, search_lexicon, search_left_factor)
 
     graph_tuple = (inflect, parse, search_lexicon, search_left_factor)
     return graph_tuple[graph_index]
@@ -275,8 +269,7 @@ def parse(form: str, kind: str = "Paradigm", name: str = "") -> list[dict]:
         feat_matches = re.findall(r"\[([^=\]]+)=([^\]]+)\]", s)
         root = re.sub(r"\[[^\]]+\]", "", s).strip()
         gloss = get_gloss_for_root(lexicon_basename, root)
-        parses.append({"root": root, "features": dict(
-            feat_matches), "gloss": gloss})
+        parses.append({"root": root, "features": dict(feat_matches), "gloss": gloss})
 
     return parses
 
@@ -291,8 +284,7 @@ def inflect(
     if isinstance(feature_values, (dict, frozendict)):
         feature_values = set(feature_values.items())
 
-    fixed_features = get_fixed_features_for_paradigm(
-        name=name, kind="Paradigm")
+    fixed_features = get_fixed_features_for_paradigm(name=name, kind="Paradigm")
     feature_values |= fixed_features
     features = set(feature for feature, _ in feature_values)
     expected_features = get_features_for_paradigm(name)
@@ -345,8 +337,7 @@ def inflect_stages(
     if isinstance(feature_values, (dict, frozendict)):
         feature_values = set(feature_values.items())
 
-    fixed_features = get_fixed_features_for_paradigm(
-        name=name, kind="Paradigm")
+    fixed_features = get_fixed_features_for_paradigm(name=name, kind="Paradigm")
     feature_values |= fixed_features
     features = set(feature for feature, _ in feature_values)
     expected_features = get_features_for_paradigm(name)
@@ -372,8 +363,7 @@ def inflect_stages(
             current_fst, nshortest=5, strip_word_edge_symbols=True
         )
         marker_value = (
-            marker.display_value if hasattr(
-                marker, "display_value") else marker.value
+            marker.display_value if hasattr(marker, "display_value") else marker.value
         )
         current_stage = InflectStage(
             root=root,
@@ -417,15 +407,13 @@ def search(
     form_fsa = word_fsa(form)
     left_factor_lattice = pynini.compose(form_fsa, left_factor).optimize()
     edit_graph = pynini.compose(left_factor_lattice, search_lexicon)
-    hits = fsm_strings_and_weights(
-        edit_graph, strip_all_tags=True, nshortest=nshortest)
+    hits = fsm_strings_and_weights(edit_graph, strip_all_tags=True, nshortest=nshortest)
 
     if do_parse:
         parses = []
         for hit, weight in hits:
             current_parse = parse(hit, kind=kind, name=name)
-            [parse_item.update(edit_distance=weight)
-             for parse_item in current_parse]
+            [parse_item.update(edit_distance=weight) for parse_item in current_parse]
             [parse_item.update(form=hit) for parse_item in current_parse]
             parses.extend(current_parse)
         return parses

@@ -10,7 +10,7 @@ from __future__ import annotations
 from loguru import logger
 
 from src.lexicon import get_roots, get_principal_part_for_all_roots
-from src.yaml_utils.models import (
+from src.models import (
     Marker,
     UnorderedMarker,
     PrincipalPartMarker,
@@ -45,7 +45,7 @@ def get_markers_for_paradigm(
     )
     feature_values -= fixed_features
 
-    combos, marker_files, contingent_files = get_feature_combos_for_paradigm(
+    combos, marker_files, multifeature_files = get_feature_combos_for_paradigm(
         name=paradigm_name, kind="Paradigm"
     )
     combos = [combo - fixed_features for combo in combos]
@@ -57,14 +57,13 @@ def get_markers_for_paradigm(
 
     markers = get_markers(
         feature_marker_files=marker_files,
-        contingent_feature_marker_files=contingent_files,
+        multifeature_feature_marker_files=multifeature_files,
         feature_values=feature_values,
     )
 
     # any global markers defined in the paradigm should be applied to all feature combinations
     # check if current feature set has a principal part, if so we don't override
-    has_principal_part = any(
-        marker.kind == "principal_part" for marker, _ in markers)
+    has_principal_part = any(marker.kind == "principal_part" for marker, _ in markers)
     if "global_markers" in paradigm_data:
         markers.extend(
             (resolve_marker(marker), "global")
@@ -89,8 +88,7 @@ def get_markers_for_paradigm(
         marker, feature_set = marker_tuple
         if marker.kind == "principal_part":
             roots = get_roots(part_of_speech)
-            pps = get_principal_part_for_all_roots(
-                part_of_speech, marker.value)
+            pps = get_principal_part_for_all_roots(part_of_speech, marker.value)
             markers[i] = (
                 PrincipalPartMarker(
                     kind="string_map",
@@ -109,8 +107,7 @@ def get_markers_for_paradigm(
     stage_order.insert(0, "principal_part")
     markers.sort(
         key=lambda m: (
-            stage_order.index(
-                m[0].stage) if m[0].stage in stage_order else float('inf')
+            stage_order.index(m[0].stage) if m[0].stage in stage_order else float("inf")
         )
     )
 
@@ -132,9 +129,7 @@ def get_fixed_features_for_paradigm(
     return fixed_features
 
 
-def get_free_features_for_paradigm(
-    name: str, kind: str = "Paradigm"
-) -> list[str]:
+def get_free_features_for_paradigm(name: str, kind: str = "Paradigm") -> list[str]:
     paradigm_data = get_yaml_data_safe(kind=kind, yaml_basename=name)
     free_features = []
     for feature, value in paradigm_data["feature_markers"].items():
@@ -171,7 +166,7 @@ def get_feature_combos_for_paradigm(
 
     for feature_name, ref in paradigm_data.get("feature_markers", {}).items():
         if ref is None:
-            # feature is only exponed via contingent markers
+            # feature is only exponed via multi-feature markers
             # or is unexponed
             continue
         if isinstance(ref, str) and ref.startswith("$"):
@@ -180,7 +175,7 @@ def get_feature_combos_for_paradigm(
             fixed[feature_name] = ref
             free_feature_names.remove(feature_name)
 
-    contingent_files = list(paradigm_data.get("contingent_markers", []))
+    multifeature_files = list(paradigm_data.get("multifeature_markers", []))
 
     free_value_lists = []
     for fname in free_feature_names:
@@ -196,7 +191,7 @@ def get_feature_combos_for_paradigm(
             set(fixed.items()) | set(combo_tuples)
             for combo_tuples in itertools.product(*free_value_lists)
         ]
-    return combos, marker_files, contingent_files
+    return combos, marker_files, multifeature_files
 
 
 def get_features_for_paradigm(name: str) -> set[str]:

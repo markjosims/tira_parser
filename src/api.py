@@ -8,43 +8,45 @@ Provides following endpoints:
 """
 
 import os
+
+import msgspec
 import pynini
+import uvicorn
 from fastapi import FastAPI, HTTPException
-from loguru import logger
 from fastapi.staticfiles import StaticFiles
+from loguru import logger
 from pydantic import BaseModel
 from pynini.lib import rewrite
-import uvicorn
 
+from src.constants import get_yaml_dir
 from src.grammar.acceptor_compilation import (
     fsa,
-    word_fsa,
     fsm_strings,
     get_symbol_table,
+    word_fsa,
 )
+from src.grammar.marker_resolution import get_free_features_for_paradigm
 from src.grammar.paradigm_compilation import (
+    get_roots_for_paradigm,
+    inflect,
     inflect_stages,
     parse,
-    inflect,
     search,
-    get_roots_for_paradigm,
 )
 from src.grammar.transducer_compilation import get_rule_fst
-from src.grammar.marker_resolution import get_free_features_for_paradigm
+from src.lexicon import (
+    get_features_for_root,
+    get_roots,
+)
 from src.yaml_utils.yaml_server import (
-    get_yaml_kind,
-    get_inventory_items,
     get_feature_map,
+    get_inflection_stages,
+    get_inventory_items,
     get_patterns,
     get_rules,
-    get_inflection_stages,
     get_yaml_data_safe,
+    get_yaml_kind,
 )
-from src.lexicon import (
-    get_roots,
-    get_features_for_root,
-)
-from src.constants import get_yaml_dir
 
 app = FastAPI()
 
@@ -88,14 +90,16 @@ def grammar_stats() -> dict:
     feature_markers_stats["inflection_stages"] = len(get_inflection_stages())
     grammar_stats["feature_markers"] = feature_markers_stats
 
-    contingent_markers_stats = {}
-    contingent_markers_yaml = get_yaml_kind("ContingentFeatureMarkers")
-    contingent_markers_stats["files"] = len(contingent_markers_yaml["valid"])
-    contingent_markers_stats["invalid_files"] = len(contingent_markers_yaml["invalid"])
-    contingent_markers_stats["total"] = sum(
-        len(file["markers"]) for _, file in contingent_markers_yaml["valid"]
+    multifeature_markers_stats = {}
+    multifeature_markers_yaml = get_yaml_kind("ContingentFeatureMarkers")
+    multifeature_markers_stats["files"] = len(multifeature_markers_yaml["valid"])
+    multifeature_markers_stats["invalid_files"] = len(
+        multifeature_markers_yaml["invalid"]
     )
-    grammar_stats["contingent_markers"] = contingent_markers_stats
+    multifeature_markers_stats["total"] = sum(
+        len(file["markers"]) for _, file in multifeature_markers_yaml["valid"]
+    )
+    grammar_stats["multifeature_markers"] = multifeature_markers_stats
 
     patterns_stats = {}
     patterns_yaml = get_yaml_kind("Patterns")
@@ -228,7 +232,7 @@ def get_patterns_route():
 
 @app.get("/rules")
 def get_rules_route():
-    return [{"name": name, **rule._asdict()} for name, rule in get_rules().items()]
+    return [msgspec.to_builtins(rule) for rule in get_rules().values()]
 
 
 class TestPatternRequest(BaseModel):
@@ -363,3 +367,6 @@ def api_search(req: SearchRequest):
 
 
 app.mount("/", StaticFiles(directory="frontend", html=True), name="static")
+
+if __name__ == "__main__":
+    run_app()

@@ -1,4 +1,4 @@
-from src.yaml_utils.models import (
+from src.models import (
     Marker,
     Rule,
     SimpleRule,
@@ -95,8 +95,7 @@ def test_2sg_a_class():
     part_of_speech = get_yaml_data_safe(kind="Paradigm", yaml_basename="$verb_a_stem")[
         "part_of_speech"
     ]
-    roots = get_roots_with_gloss(
-        lexicon_basename=part_of_speech, gloss="speak")
+    roots = get_roots_with_gloss(lexicon_basename=part_of_speech, gloss="speak")
     assert roots == ["habl"]
 
     root = roots[0]
@@ -111,16 +110,14 @@ def test_2sg_a_class():
 
     # here we invalidate the cache whenever the test is run
     # TODO: directly test automatic cache invalidation when source files are changed
-    _get_or_build(graph_type="inflect",
-                  paradigm_name="verb_a_stem", force_rebuild=True)
+    _get_or_build(graph_type="inflect", paradigm_name="verb_a_stem", force_rebuild=True)
 
     inflect_result = inflect(
         root=root, feature_values=feature_values, name="verb_a_stem"
     )
     assert inflect_result == result_strings
 
-    _get_or_build(graph_type="parse",
-                  paradigm_name="verb_a_stem", force_rebuild=True)
+    _get_or_build(graph_type="parse", paradigm_name="verb_a_stem", force_rebuild=True)
 
     parse_result = parse(expected_form, kind="Paradigm", name="verb_a_stem")
     expected_parse = {

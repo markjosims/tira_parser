@@ -7,6 +7,15 @@ patterns:
   - name: Voiced palatal stop
     pattern: ɟ
     ref: <J>
+  - name: Epsilon 
+    pattern: ɛ
+    ref: <E>
+  - name: Open O
+    pattern: ɔ
+    ref: <O>
+  - name: Reverse epsilon
+    ref: <3>
+    pattern: ɜ
   - name: Voiced dental fricative
     pattern: ð
     ref: <D>

@@ -35,7 +35,7 @@ const CARD_GROUPS = {
       title: 'Feat. Markers',
       format: (d) => [`${d.files} files`, `${d.invalid_files} invalid files`, `${d.total} markers`, `${d.inflection_stages} inflection stages`]
     },
-    contingent_markers: {
+    multifeature_markers: {
       title: 'Cont. Markers',
       format: (d) => [`${d.files} files`, `${d.invalid_files} invalid files`, `${d.total} markers`]
     },

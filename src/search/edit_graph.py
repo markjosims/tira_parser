@@ -381,9 +381,9 @@ def _get_substitution_graph(
 
         for sub in subs_w_intab:
             _, outtab, cost = sub
-            sub_fst_right = pynini.cross(
-                intab_sub_symbol, outtab
-            ) + pynini.accep("", weight=cost)
+            sub_fst_right = pynini.cross(intab_sub_symbol, outtab) + pynini.accep(
+                "", weight=cost
+            )
 
             sub_graph_right = sub_graph_right | sub_fst_right
 

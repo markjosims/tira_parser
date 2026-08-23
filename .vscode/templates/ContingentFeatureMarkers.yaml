@@ -1,5 +1,5 @@
 # This is a ContingentFeatureMarkers config file
-# Define morphological realizations contingent on multiple features.
+# Define morphological realizations multi-feature on multiple features.
 kind: ContingentFeatureMarkers
 features:
   # List of features this set expones, e.g.:

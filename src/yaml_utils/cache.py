@@ -90,9 +90,7 @@ def get_hashable_args_and_kwargs(args, kwargs):
         try:
             hash(hashable_arg)
         except Exception as e:
-            raise ValueError(
-                f"Could not hash kwarg {value} with key {key}: {e}"
-            )
+            raise ValueError(f"Could not hash kwarg {value} with key {key}: {e}")
 
         hashable_args.append(hashable_arg)
 
@@ -106,9 +104,7 @@ def get_hashable_args_and_kwargs(args, kwargs):
         try:
             hash(hashable_value)
         except Exception as e:
-            raise ValueError(
-                f"Could not hash kwarg {value} with key {key}: {e}"
-            )
+            raise ValueError(f"Could not hash kwarg {value} with key {key}: {e}")
 
         hashable_kwargs[key] = hashable_value
 
